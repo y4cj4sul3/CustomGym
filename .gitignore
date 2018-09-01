@@ -1,2 +1,5 @@
 # Python cache
 **/__pycache__/
+
+# Python package
+custom_gym.egg-info
