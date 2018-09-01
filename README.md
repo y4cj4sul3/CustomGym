@@ -1,4 +1,4 @@
-ustom Gym Environment
+# Custom Gym Environment
 Custom OpenAI gym environment
 
 ## Installation
