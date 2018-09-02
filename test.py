@@ -13,12 +13,12 @@ print(env.observation_space)
 #env = wrappers.Monitor(env, './Movie', force=True)
 
 # Test Environment
-for i_episode in range(10):
+for i_episode in range(3):
 
   # Reset Environment
-  task, obs = env.reset()
+  obs = env.reset()
   t = 0
-  print('task id: {}'.format(task))
+  print('task id: {}:{}'.format(obs[2], obs[3]))
 
   # Run Episode
   while True:

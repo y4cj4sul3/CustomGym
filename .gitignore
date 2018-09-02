@@ -3,3 +3,6 @@
 
 # Python package
 custom_gym.egg-info
+
+# Unity executable
+custom_gym/unity/assets

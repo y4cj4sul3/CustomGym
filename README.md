@@ -9,12 +9,14 @@ pip install -e .
 
 ## Usage
 Just install and import the package ```custom_gym``` and here you go!
-Currently only ```MountainCarEx-v0``` is available, which extends from original ```MountainCar-v0```.
 ```python
 import gym
 import custom_gym
 
+# classic_control
 env = gym.make('MountainCarEx-v0')
+# unity
+env = gym.make('Kobuki-v0')
 ```
 See detail example in ```test.py```.
 

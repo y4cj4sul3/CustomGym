@@ -6,3 +6,9 @@ register(
     max_episode_steps=200,
     reward_threshold=-110.0,
 )
+
+register(
+    id='Kobuki-v0',
+    entry_point='custom_gym.unity:KobukiEnv',
+    
+)
