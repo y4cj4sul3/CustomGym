@@ -8,6 +8,7 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import numpy as np
+#from custom_gym.utils import Recoder
 
 class MountainCarEnv(gym.Env):
     metadata = {
@@ -16,21 +17,22 @@ class MountainCarEnv(gym.Env):
     }
 
     def __init__(self):
-        self.min_position = -1.2
-        self.max_position = 0.6
+        self.min_position = -1.
+        self.max_position = 1.
         self.max_speed = 0.07
         
-        self.right_goal = 0.5
-        self.left_goal = -1.1
-        #self.goal_position = 0.5
+        self.right_goal = 0.9
+        self.left_goal = -0.9
 
-        self.low = np.array([self.min_position, -self.max_speed])
-        self.high = np.array([self.max_position, self.max_speed])
+        self.low = np.array([self.min_position, -self.max_speed, 0])
+        self.high = np.array([self.max_position, self.max_speed, 1])
 
         self.viewer = None
 
         self.action_space = spaces.Discrete(3)
         self.observation_space = spaces.Box(self.low, self.high)
+
+        #self.recoder = Recoder('dataset/MountainCarEx_new/')
 
         self.seed()
         self.reset()
@@ -43,14 +45,18 @@ class MountainCarEnv(gym.Env):
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
         
         # states before simulate
-        position, velocity = self.state
+        position, velocity, _ = self.state
+
+        # record traj
+        #self.recoder.step(self.state[0:2], action)
 
         # simualte
-        velocity += (action-1)*0.001 + math.cos(3*position)*(-0.0025)
+        velocity += (action-1)*0.001 + math.cos(3*position - np.pi /2)*(-0.0025)
         velocity = np.clip(velocity, -self.max_speed, self.max_speed)
         position += velocity
         position = np.clip(position, self.min_position, self.max_position)
         if (position==self.min_position and velocity<0): velocity = 0
+        if (position==self.max_position and velocity>0): velocity = 0
         
         # states after simulate
         if self.task_id == 0:
@@ -59,9 +65,14 @@ class MountainCarEnv(gym.Env):
         elif self.task_id == 1:
             # left goal
             done = bool(position <= self.left_goal)
+        
+        # save traj
+        #if done:
+        #    self.recoder.save([position, velocity])
+
         reward = -1.0
 
-        self.state = (position, velocity)
+        self.state = (position, velocity, self.task_id)
         return np.array(self.state), reward, done, {}
 
     def reset(self, task_id=None):
@@ -76,13 +87,17 @@ class MountainCarEnv(gym.Env):
         elif self.task_id == 1:
             self.goal_position = self.left_goal
 
+        # reset traj
+        #self.recoder.reset_traj()
+        #self.recoder.traj['task'] = self.task_id
+
         # state
-        self.state = np.array([self.np_random.uniform(low=-0.6, high=-0.4), 0])
+        self.state = np.array([self.np_random.uniform(low=-0.1, high=0.1), 0, self.task_id])
         #print(np.shape([self.task_id, self.state]))
-        return self.task_id, np.array(self.state)
+        return np.array(self.state)
 
     def _height(self, xs):
-        return np.sin(3 * xs)*.45+.55
+        return np.sin(3 * xs - np.pi / 2)*.45+.55
 
     def render(self, mode='human'):
         screen_width = 600
@@ -92,7 +107,6 @@ class MountainCarEnv(gym.Env):
         scale = screen_width/world_width
         carwidth=40
         carheight=20
-
 
         if self.viewer is None:
             from gym.envs.classic_control import rendering
@@ -137,7 +151,7 @@ class MountainCarEnv(gym.Env):
 
         pos = self.state[0]
         self.cartrans.set_translation((pos-self.min_position)*scale, self._height(pos)*scale)
-        self.cartrans.set_rotation(math.cos(3 * pos))
+        self.cartrans.set_rotation(math.cos(3 * pos - np.pi / 2))
         self.flagtrans.set_translation((self.goal_position-self.min_position)*scale, self._height(self.goal_position)*scale)
 
         return self.viewer.render(return_rgb_array = mode=='rgb_array')
