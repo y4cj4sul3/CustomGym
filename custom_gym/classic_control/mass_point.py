@@ -48,9 +48,10 @@ class MassPointEnv(gym.Env):
 
     def step(self, action):
         # Check action
+        print(action)
         action = np.clip(action, self.low_action, self.high_action)
         assert self.action_space.contains(action), "%r (%s) invalid action" % (action, type(action))
-
+        
         # States before simulate
         xpos, ypos, xface, yface = self.obs[0:4]
         f_speed, rotate = action

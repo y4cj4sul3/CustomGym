@@ -3,7 +3,8 @@ import custom_gym
 #from gym import wrappers
 
 # Create Environment
-env = gym.make('MountainCarEx-v0')
+#env = gym.make('MountainCarEx-v0')
+env = gym.make('Kobuki-v0')
 
 # Print action & observation space
 print(env.action_space)
@@ -18,15 +19,16 @@ for i_episode in range(3):
   # Reset Environment
   obs = env.reset()
   t = 0
-  print('task id: {}:{}'.format(obs[2], obs[3]))
+  #print('task id: {}:{}'.format(obs[2], obs[3]))
 
   # Run Episode
   while True:
     # Render Environment
-    env.render()
+    #env.render()
     
     # Interact with Environment
-    action = env.action_space.sample()
+    #action = env.action_space.sample()
+    action = [0, 0]
     obs, reward, done, info = env.step(action)
     #print("Reward: {}".format(reward))
     #print(obs)
