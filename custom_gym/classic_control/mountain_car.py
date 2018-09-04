@@ -8,6 +8,7 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import numpy as np
+#from custom_gym.utils import Recoder
 
 class MountainCarEnv(gym.Env):
     metadata = {
@@ -31,6 +32,8 @@ class MountainCarEnv(gym.Env):
         self.action_space = spaces.Discrete(3)
         self.observation_space = spaces.Box(self.low, self.high)
 
+        #self.recoder = Recoder('dataset/MountainCarEx_new/')
+
         self.seed()
         self.reset()
 
@@ -43,6 +46,9 @@ class MountainCarEnv(gym.Env):
         print(action)        
         # states before simulate
         position, velocity, _ = self.state
+
+        # record traj
+        #self.recoder.step(self.state[0:2], action)
 
         # simualte
         velocity += (action-1)*0.001 + math.cos(3*position - np.pi /2)*(-0.0025)
@@ -59,6 +65,11 @@ class MountainCarEnv(gym.Env):
         elif self.task_id == 1:
             # left goal
             done = bool(position <= self.left_goal)
+        
+        # save traj
+        #if done:
+        #    self.recoder.save([position, velocity])
+
         reward = -1.0
 
         self.state = (position, velocity, self.task_id)
@@ -75,6 +86,10 @@ class MountainCarEnv(gym.Env):
             self.goal_position = self.right_goal
         elif self.task_id == 1:
             self.goal_position = self.left_goal
+
+        # reset traj
+        #self.recoder.reset_traj()
+        #self.recoder.traj['task'] = self.task_id
 
         # state
         self.state = np.array([self.np_random.uniform(low=-0.1, high=0.1), 0, self.task_id])

@@ -33,6 +33,9 @@ class Recoder:
         # save file
         with open(self.file_path+'traj_{}.json'.format(self.count), 'w') as fp:
             json.dump(self.traj, fp, indent=2)
+        print('Save file: ' + self.file_path + 'traj_{}.json'.format(self.count))
+
+        self.count += 1
 
         # reset
         self.reset_traj()
