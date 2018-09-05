@@ -43,7 +43,7 @@ class MountainCarEnv(gym.Env):
 
     def step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
-        
+        print(action)        
         # states before simulate
         position, velocity, _ = self.state
 

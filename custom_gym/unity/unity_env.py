@@ -9,11 +9,12 @@ from gym.spaces.discrete import Discrete
 import os
 
 class UnityEnv(gym.Env):
-    def __init__(self, app_name=None):
+    def __init__(self, app_name=None, idx=0):
         # parameter
         app_path = os.path.join(os.path.dirname(__file__), 'assets', app_name)
-        idx = 0
+        idx = idx
         no_graphics = False
+        self.num_envs = 1
 
         # create environment
         self._env = UnityEnvironment(file_name=app_path, worker_id=idx, no_graphics=no_graphics)
@@ -50,7 +51,7 @@ class UnityEnv(gym.Env):
         self.frames = []
         info = self._env.reset()[self.brain_name] 
         state = info.vector_observations[0]
-        return state
+        return np.array([state])
 
     def step(self, action):
         info = self._env.step([action])[self.brain_name]
@@ -60,7 +61,7 @@ class UnityEnv(gym.Env):
         done = info.local_done[0] 
 
         self._collect_frames(info.visual_observations[0])
-        return state, reward, done, None
+        return np.array([state]), np.array([reward]), np.array([done]), np.array([None])
 
     def close(self):
         self._env.close()
