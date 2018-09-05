@@ -24,3 +24,10 @@ register(
     entry_point='custom_gym.unity:KobukiEnv',
     
 )
+
+# mujoco
+
+register(
+    id='ReacherEx-v0',
+    entry_point='custom_gym.mujoco:ReacherEnv'
+)

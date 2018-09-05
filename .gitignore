@@ -6,3 +6,6 @@ custom_gym.egg-info
 
 # Unity executable
 custom_gym/unity/assets
+
+# tmp mujoco
+custom_gym/mujoco/
