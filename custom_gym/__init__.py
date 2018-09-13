@@ -2,7 +2,6 @@ from custom_gym.utils.recoder import Recoder
 from gym.envs.registration import register
 
 # classic control
-
 register(
     id='MountainCarEx-v0',
     entry_point='custom_gym.classic_control:MountainCarEnv',
@@ -23,8 +22,13 @@ register(
     max_episode_steps=200,
 )
 
-# unity
+register(
+    id='FiveTargetColor-v0',
+    entry_point='custom_gym.classic_control:FiveTargetColorEnv',
+    max_episode_steps=200,
+)
 
+# unity
 register(
     id='Kobuki-v0',
     entry_point='custom_gym.unity:KobukiEnv',
