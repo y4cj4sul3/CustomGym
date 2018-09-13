@@ -18,6 +18,7 @@ class FiveTargetEnv(gym.Env):
         self.num_targets = 5
         
         # Define Instruction Space
+        # one-hot
         self.high_instr = np.ones(self.num_targets)
         self.low_instr = np.zeros(self.num_targets)
         
@@ -29,11 +30,18 @@ class FiveTargetEnv(gym.Env):
         self.low_action = np.array([0, -1])
         
         self.action_space = spaces.Box(self.low_action, self.high_action, dtype=np.float32)
+        
+        # Define State Space
+        # [xpos, ypos, xface, yface]
+        self.high_state = np.array([1, 1, 1, 1])
+        self.low_state = -self.high_state
+        
+        self.state_space = spaces.Box(self.low_state, self.high_state, dtype=np.float32)
 
         # Define Observation Space
-        # [xpos, ypos, xface, yface] + instruction
-        self.high_obs = np.concatenate(([1, 1, 1, 1], self.high_instr))
-        self.low_obs = np.concatenate(([-1, -1, -1, -1], self.low_instr))
+        # [xpos, ypos] + instruction
+        self.high_obs = np.concatenate((self.high_state[0:2], self.high_instr))
+        self.low_obs = np.concatenate((self.low_state[0:2], self.low_instr))
 
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
 
@@ -62,7 +70,7 @@ class FiveTargetEnv(gym.Env):
         assert self.action_space.contains(action), "%r (%s) invalid action" % (action, type(action))
         
         # States before simulate
-        xpos, ypos, xface, yface = self.obs[0:4]
+        xpos, ypos, xface, yface = self.state
         f_speed, rotate = action
         theta = np.arctan2(yface, xface)
 
@@ -76,15 +84,14 @@ class FiveTargetEnv(gym.Env):
         ypos = ypos + yface*self.speed_scale*f_speed
 
         # States after simulate
-        self.obs = [xpos, ypos, xface, yface]
-        self.obs = np.concatenate((self.obs, self.instr))
-        self.obs = np.clip(self.obs, self.low_obs, self.high_obs)
+        self.state = [xpos, ypos, xface, yface]
+        self.state = np.clip(self.state, self.low_state, self.high_state)
 
         # TODO Define reward function
         # TODO Define done
         done = False
         reward = 0
-        xpos, ypos, xface, yface = self.obs[0:4]
+        xpos, ypos, xface, yface = self.state
         # time penalty
         reward -= 0.005
         # hit the target
@@ -104,7 +111,7 @@ class FiveTargetEnv(gym.Env):
                 done = True
                 reward += -1
 
-        return self.obs, reward, done, {}
+        return self.get_obs(), reward, done, {}
 
     def reset(self, task=None):
         
@@ -127,10 +134,14 @@ class FiveTargetEnv(gym.Env):
         self.target_color[self.task] = [1, 0, 0]
 
         # State
-        theta = 2*np.pi*np.random.rand()
-        self.obs = np.concatenate(([0, 0, np.cos(theta), np.sin(theta)], self.instr))
+        self.state = np.array([0, 0, 0, 1])
 
-        return self.obs
+        return self.get_obs()
+        
+    def get_obs(self):
+        obs = np.concatenate((self.state[0:2], self.instr))
+        assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
+        return obs
 
     def render(self, mode='human'):
         # Parameters
@@ -171,12 +182,12 @@ class FiveTargetEnv(gym.Env):
             self.viewer.add_geom(point_head)
 
         # Transform
-        xpos, ypos, xface, yface = self.obs[0:4]
+        # agebt
+        xpos, ypos, xface, yface = self.state
         theta = np.arctan2(yface, xface)
         self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
         self.point_trans.set_rotation(theta)
-        #xpos, ypos = self.task
-        #self.region_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
+        # target
         print(len(self.targets))
         for i in range(5):
             r, g, b = self.target_color[i]
