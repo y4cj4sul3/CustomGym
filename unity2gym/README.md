@@ -1,0 +1,4 @@
+- version 0: coord, normal reward
+- version 1: no coord, normal reward
+- version 2: coord, rewarding when close to target
+- version 3: coord, rewarding when hit wrong target

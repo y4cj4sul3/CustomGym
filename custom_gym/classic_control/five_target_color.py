@@ -3,24 +3,26 @@ from gym import spaces
 from gym.utils import seeding
 import numpy as np
 
-class FiveTargetEnv(gym.Env):
+class FiveTargetColorEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
     }
 
     def __init__(self, idx=0):
+        print("here")
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
         self.speed_scale = 0.05
         self.rotate_scale = 0.3
         self.num_targets = 5
+        self.color_code_dim = 3
         
         # Define Instruction Space
         # one-hot
-        self.high_instr = np.ones(self.num_targets)
-        self.low_instr = np.zeros(self.num_targets)
+        self.high_instr = np.ones(self.color_code_dim)
+        self.low_instr = np.zeros(self.color_code_dim)
         
         self.instr_space = spaces.Box(self.low_instr, self.high_instr, dtype=np.float32)
 
@@ -56,13 +58,21 @@ class FiveTargetEnv(gym.Env):
         
         self.target_size = 0.2
 
+        # Color Code
+        self.color = np.array([
+            [1.0, 0.0, 0.0], 
+            [0.0, 1.0, 0.0], 
+            [0.0, 0.0, 1.0],
+            [1.0, 0.0, 1.0],
+            [0.0, 1.0, 1.0],
+        ])
+
         # Timestep
         self.max_timesteps = 200
         self.timesteps = 0
 
         self.seed()
         self.reset()
-        
     
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -136,15 +146,13 @@ class FiveTargetEnv(gym.Env):
         self.task = np.array(task)
         
         # Instruction
-        self.instr = np.zeros(5)
-        self.instr[self.task] = 1
+        self.instr = self.color[self.task]
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
 
         # Set target
         self.target_color = []
         for i in range(5):
-            self.target_color.append([0, 1, 0])
-        self.target_color[self.task] = [1, 0, 0]
+            self.target_color.append(self.color[i])
 
         # Timestep
         self.timesteps = 0
@@ -198,11 +206,12 @@ class FiveTargetEnv(gym.Env):
             self.viewer.add_geom(point_head)
 
         # Transform
-        # agent
+        # agebt
         xpos, ypos, xface, yface = self.state
         theta = np.arctan2(yface, xface)
         self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
         self.point_trans.set_rotation(theta)
+        
         # target
         #print(len(self.targets))
         for i in range(5):
