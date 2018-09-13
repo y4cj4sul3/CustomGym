@@ -40,8 +40,8 @@ class FiveTargetEnv(gym.Env):
 
         # Define Observation Space
         # [xpos, ypos] + instruction
-        self.high_obs = np.concatenate((self.high_state[0:2], self.high_instr))
-        self.low_obs = np.concatenate((self.low_state[0:2], self.low_instr))
+        self.high_obs = np.concatenate((self.high_state, self.high_instr))
+        self.low_obs = np.concatenate((self.low_state, self.low_instr))
 
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
 
@@ -99,7 +99,7 @@ class FiveTargetEnv(gym.Env):
         # time penalty(distance)
         vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
         dist = np.linalg.norm(vec)
-        reward += -dist
+        reward += -dist * 0.1
         # hit the target
         for i in range(self.num_targets):
             vec = np.array([xpos-self.target_coord[i][0], ypos-self.target_coord[i][1]])
@@ -108,10 +108,10 @@ class FiveTargetEnv(gym.Env):
                 done = True
                 if i == self.task:
                     print('Right Target')
-                    reward += 1
+                    #reward += 1
                 else:
                     print('Wrong Target')
-                    reward += 0.2
+                    #reward += 0.2
                 break
         # hit the wall
         if not done:
@@ -134,11 +134,11 @@ class FiveTargetEnv(gym.Env):
         if task is None:
             #task = np.random.random_sample(np.shape(self.low_task))
             #task = task*(self.high_task-self.low_task)+self.low_task
-            task = np.random.randint(5)
+            task = np.random.randint(self.num_targets)
         self.task = np.array(task)
         
         # Instruction
-        self.instr = np.zeros(5)
+        self.instr = np.zeros(self.num_targets)
         self.instr[self.task] = 1
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
 
@@ -152,12 +152,13 @@ class FiveTargetEnv(gym.Env):
         self.timesteps = 0
 
         # State
-        self.state = np.array([0, 0, 0, -1])
+        theta = 2*np.pi*np.random.random_sample()
+        self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
 
         return self.get_obs()
         
     def get_obs(self):
-        obs = np.concatenate((self.state[0:2], self.instr))
+        obs = np.concatenate((self.state, self.instr))
         assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
         return obs
 
@@ -178,7 +179,7 @@ class FiveTargetEnv(gym.Env):
             #self.region_trans = rendering.Transform()
             
             # draw traget
-            for i in range(5):
+            for i in range(self.num_targets):
                 region = rendering.make_circle(region_size)
                 region_trans = rendering.Transform()
                 region_trans.set_translation((self.target_coord[i][0]+1)*scale, (self.target_coord[i][1]+1)*scale)
@@ -207,7 +208,7 @@ class FiveTargetEnv(gym.Env):
         self.point_trans.set_rotation(theta)
         # target
         #print(len(self.targets))
-        for i in range(5):
+        for i in range(self.num_targets):
             r, g, b = self.target_color[i]
             self.targets[i].set_color(r, g, b)
 
