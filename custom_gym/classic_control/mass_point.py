@@ -9,7 +9,7 @@ class MassPointEnv(gym.Env):
         'video.frames_per_second': 30
     }
 
-    def __init__(self):
+    def __init__(self, idx=0):
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
@@ -48,7 +48,7 @@ class MassPointEnv(gym.Env):
 
     def step(self, action):
         # Check action
-        print(action)
+        #print(action)
         action = np.clip(action, self.low_action, self.high_action)
         assert self.action_space.contains(action), "%r (%s) invalid action" % (action, type(action))
         
@@ -74,8 +74,11 @@ class MassPointEnv(gym.Env):
         # TODO Define reward function
         reward = 0
         dist = np.sqrt(np.sum(np.power(self.obs[0:2]-self.task, 2)))
-        if dist < 0.1:
+        reward = 1-dist
+        '''
+	if dist < 0.1:
             reward += 2-dist*10
+	'''
 
         # TODO Define done
         done = False
