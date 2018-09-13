@@ -6,3 +6,5 @@ custom_gym.egg-info
 
 # Unity executable
 custom_gym/unity/assets
+.DS_Store
+._.DS_Store

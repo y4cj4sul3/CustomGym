@@ -19,6 +19,8 @@ class UnityColor7_v1(UnityEnvV1):
 # ----------------------------------------
 def make_env(env_name, idx):
     print(env_name)
+    if env_name == 'UnityDiversitySkillRL_v2':
+        return UnityDiversitySkillRL_v2(idx=idx)
     if env_name == 'UnityColor7_v0':
         return UnityColor7_v0(idx=idx)
     if env_name == 'UnityColor7_v1':

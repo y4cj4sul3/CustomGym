@@ -42,9 +42,11 @@ class UnityEnvV0():
             self._observation_space = Box(-high, high)
 
         # video buffer
+        self._time = 0
         self.frames = []
     
     def reset(self):
+        self._time = 0
         self.frames = []
         
         info = self._env.reset()[self.brain_name] 
@@ -60,10 +62,18 @@ class UnityEnvV0():
         state = info.vector_observations[0][:]
         reward = info.rewards[0]
         done = info.local_done[0]
-        
+        if reward < -0.18 and reward > -0.22: reward = 0.2
+        exinfo = {
+            'episode': {
+                'r': reward,
+                'l': self._time,
+            }
+        }
+
         self._pos = info.vector_observations[0][:2]
+        self._time += 1
         self._collect_frames(info.visual_observations[0][0])
-        return state, reward, done, None
+        return state, reward, done, exinfo
 
     def close(self):
         self._env.close()
