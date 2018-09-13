@@ -8,13 +8,13 @@ from rllab.spaces.discrete import Discrete
 
 import numpy as np
 
-class UnityEnvNoPos(Env, Serializable):
+class UnityEnvV0(Env, Serializable):
     def __init__(self, app_name, time_state=False, idx=0, is_render=False, no_graphics=False, recording=True):
         Serializable.quick_init(self, locals())
     
         # Unity scene
         self._env = UnityEnvironment(file_name=app_name, worker_id=idx, no_graphics=no_graphics)
-        self.spec = self
+        self.id = 0
 
         self.name = app_name
         self.idx = idx
@@ -48,17 +48,17 @@ class UnityEnvNoPos(Env, Serializable):
             if self.time_state:
                 high = np.array([np.inf] * (brain.vector_observation_space_size+1))
             else:
-                high = np.array([np.inf] * (brain.vector_observation_space_size-2))
+                high = np.array([np.inf] * (brain.vector_observation_space_size))
             self._observation_space = Box(-high, high)
 
         # video buffer
         self.frames = []
-
+    
     def reset(self):
         self.frames = []
         info = self._env.reset()[self.brain_name] 
         if self.is_render: self.observation = info.visual_observations[0]
-        state = info.vector_observations[0][2:]
+        state = info.vector_observations[0][:]
         self._pos = info.vector_observations[0][:2]
         if self.time_state: 
             state = np.hstack((state, [self.time_step]))
@@ -69,14 +69,15 @@ class UnityEnvNoPos(Env, Serializable):
     def step(self, action):
         info = self._env.step([action])[self.brain_name]
         if self.is_render: self.observation = info.visual_observations[0]
-        state = info.vector_observations[0][2:]
+        state = info.vector_observations[0][:]
         self._pos = info.vector_observations[0][:2]
         reward = info.rewards[0]
-        done = info.local_done[0] 
+        done = info.local_done[0]
         if self.time_state: 
             state = np.hstack((state, [self.time_step]))
             self.time_step += 1
             if done: self.time_step = 0
+        self._collect_frames(info.visual_observations[0][0])
         return Step(observation=state.flatten(), reward=reward, done=done)
 
     def terminate(self):
