@@ -54,7 +54,11 @@ class FiveTargetEnv(gym.Env):
         self.target_coord = [np.deg2rad(x) for x in self.target_coord]
         self.target_coord = [(np.cos(x), np.sin(x)) for x in self.target_coord]
         
-        self.target_size = 0.1
+        self.target_size = 0.2
+
+        # Timestep
+        self.max_timesteps = 200
+        self.timesteps = 0
 
         self.seed()
         self.reset()
@@ -92,8 +96,10 @@ class FiveTargetEnv(gym.Env):
         done = False
         reward = 0
         xpos, ypos, xface, yface = self.state
-        # time penalty
-        reward -= 0.005
+        # time penalty(distance)
+        vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
+        dist = np.linalg.norm(vec)
+        reward += -dist
         # hit the target
         for i in range(self.num_targets):
             vec = np.array([xpos-self.target_coord[i][0], ypos-self.target_coord[i][1]])
@@ -101,15 +107,24 @@ class FiveTargetEnv(gym.Env):
             if dist < self.target_size:
                 done = True
                 if i == self.task:
+                    print('Right Target')
                     reward += 1
                 else:
-                    reward += -0.2
+                    print('Wrong Target')
+                    reward += 0.2
                 break
         # hit the wall
         if not done:
             if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
                 done = True
                 reward += -1
+                print('Hit the Wall')
+        # times up
+        self.timesteps += 1
+        if not done and self.timesteps >= self.max_timesteps:
+            done = True
+            reward += -0.5
+            print('Times Up')
 
         return self.get_obs(), reward, done, {}
 
@@ -133,8 +148,11 @@ class FiveTargetEnv(gym.Env):
             self.target_color.append([0, 1, 0])
         self.target_color[self.task] = [1, 0, 0]
 
+        # Timestep
+        self.timesteps = 0
+
         # State
-        self.state = np.array([0, 0, 0, 1])
+        self.state = np.array([0, 0, 0, -1])
 
         return self.get_obs()
         
@@ -188,7 +206,7 @@ class FiveTargetEnv(gym.Env):
         self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
         self.point_trans.set_rotation(theta)
         # target
-        print(len(self.targets))
+        #print(len(self.targets))
         for i in range(5):
             r, g, b = self.target_color[i]
             self.targets[i].set_color(r, g, b)
