@@ -9,10 +9,10 @@ class FiveTargetColorEnv(gym.Env):
         'video.frames_per_second': 30
     }
 
-    def __init__(self, idx=0):
+    def __init__(self):
         self.Debug = False
 
-        # Parameters      
+        # Parameters
         self.min_pos = -1
         self.max_pos = 1
         self.speed_scale = 0.05
@@ -150,7 +150,7 @@ class FiveTargetColorEnv(gym.Env):
             if np.all(code == (0, 0, 1)): return 2
             if np.all(code == (1, 0, 1)): return 3
             if np.all(code == (0, 1, 1)): return 4
-        
+
         # Task
         self.task = np.random.randint(5) if task is None else color_code2idx(task)
         self.task = np.array(self.task)
@@ -166,7 +166,8 @@ class FiveTargetColorEnv(gym.Env):
         self.timesteps = 0
 
         # State
-        self.state = np.array([0, 0, 0, -1])
+        theta = 2 * np.pi * np.random.random_sample()
+        self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
 
         return self.get_obs()
         
@@ -179,24 +180,24 @@ class FiveTargetColorEnv(gym.Env):
         # Parameters
         screen_size = 600
         world_size = self.max_pos - self.min_pos
-        scale = screen_size/world_size
+        scale = screen_size / world_size
 
         point_size = 15
-        region_size = self.target_size*scale
-	
+        region_size = self.target_size * scale
+
+        # Visualize
+        # -----------------------------------
         if self.viewer is None:
             from gym.envs.classic_control import rendering
             self.viewer = rendering.Viewer(screen_size, screen_size)
-
             self.point_trans = rendering.Transform()
-            #self.region_trans = rendering.Transform()
-            
+
             # draw traget
             for i in range(5):
                 region = rendering.make_circle(region_size)
                 region_trans = rendering.Transform()
                 region_trans.set_translation((self.target_coord[i][0]+1)*scale, (self.target_coord[i][1]+1)*scale)
-                #region.set_color(0.9, 0.9, 0)
+                
                 region.add_attr(region_trans)
                 self.targets.append(region)
                 self.viewer.add_geom(region)
@@ -214,32 +215,19 @@ class FiveTargetColorEnv(gym.Env):
             self.viewer.add_geom(point_head)
 
         # Transform
-        # agebt
+        # -----------------------------------
+        # agent
         xpos, ypos, xface, yface = self.state
         theta = np.arctan2(yface, xface)
         self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
         self.point_trans.set_rotation(theta)
         
         # target
-        #print(len(self.targets))
         for i in range(5):
             r, g, b = self.target_color[i]
             self.targets[i].set_color(r, g, b)
-
-        return self.viewer.render(return_rgb_array = mode=='rgb_array')
+        return self.viewer.render(return_rgb_array = (mode=='rgb_array'))
 
     def close(self):
         if self.viewer:
             self.viewer.close()
-
-
-
-
-
-        
-
-
-
-
-
-

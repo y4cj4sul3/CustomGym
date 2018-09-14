@@ -28,6 +28,12 @@ register(
     max_episode_steps=200,
 )
 
+register(
+    id='FiveTargetColor-v1',
+    entry_point='custom_gym.classic_control:FiveTargetColorV1Env',
+    max_episode_steps=200,
+)
+
 # unity
 register(
     id='Kobuki-v0',
