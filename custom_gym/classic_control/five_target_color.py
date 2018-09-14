@@ -9,9 +9,10 @@ class FiveTargetColorEnv(gym.Env):
         'video.frames_per_second': 30
     }
 
-    def __init__(self, idx=0):
-        print("here")
-        # Parameters      
+    def __init__(self):
+        self.Debug = False
+
+        # Parameters
         self.min_pos = -1
         self.max_pos = 1
         self.speed_scale = 0.05
@@ -59,7 +60,7 @@ class FiveTargetColorEnv(gym.Env):
         self.target_size = 0.2
 
         # Color Code
-        self.color = np.array([
+        self.colors = np.array([
             [1.0, 0.0, 0.0], 
             [0.0, 1.0, 0.0], 
             [0.0, 0.0, 1.0],
@@ -89,10 +90,12 @@ class FiveTargetColorEnv(gym.Env):
         theta = np.arctan2(yface, xface)
 
         # Simulate
+        # --------------------------------------
         # update facing
         theta = theta + self.rotate_scale*rotate
         xface = np.cos(theta)
         yface = np.sin(theta)
+        
         # update position
         xpos = xpos + xface*self.speed_scale*f_speed
         ypos = ypos + yface*self.speed_scale*f_speed
@@ -101,15 +104,15 @@ class FiveTargetColorEnv(gym.Env):
         self.state = [xpos, ypos, xface, yface]
         self.state = np.clip(self.state, self.low_state, self.high_state)
 
-        # TODO Define reward function
-        # TODO Define done
         done = False
         reward = 0
         xpos, ypos, xface, yface = self.state
+        
         # time penalty(distance)
         vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
         dist = np.linalg.norm(vec)
         reward += -dist
+        
         # hit the target
         for i in range(self.num_targets):
             vec = np.array([xpos-self.target_coord[i][0], ypos-self.target_coord[i][1]])
@@ -117,48 +120,55 @@ class FiveTargetColorEnv(gym.Env):
             if dist < self.target_size:
                 done = True
                 if i == self.task:
-                    print('Right Target')
-                    reward += 1
+                    if self.Debug: print('Right Target')
+                    reward += 5
                 else:
-                    print('Wrong Target')
-                    reward += 0.2
+                    if self.Debug: print('Wrong Target')
+                    reward += 1
                 break
+        
         # hit the wall
         if not done:
             if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
                 done = True
-                reward += -1
-                print('Hit the Wall')
+                reward += -5
+                if self.Debug: print('Hit the Wall')
+        
         # times up
-        self.timesteps += 1
+        self.timesteps += 5
         if not done and self.timesteps >= self.max_timesteps:
             done = True
-            reward += -0.5
-            print('Times Up')
+            reward += -3
+            if self.Debug: print('Times Up')
+        if done: print(reward)
 
         return self.get_obs(), reward, done, {}
 
     def reset(self, task=None):
-        
+        def color_code2idx(code):
+            if np.all(code == (1, 0, 0)): return 0
+            if np.all(code == (0, 1, 0)): return 1
+            if np.all(code == (0, 0, 1)): return 2
+            if np.all(code == (1, 0, 1)): return 3
+            if np.all(code == (0, 1, 1)): return 4
+
         # Task
-        if task is None:
-            task = np.random.randint(5)
-        self.task = np.array(task)
+        self.task = np.random.randint(5) if task is None else color_code2idx(task)
+        self.task = np.array(self.task)
         
         # Instruction
-        self.instr = self.color[self.task]
+        self.instr = self.colors[self.task]
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
 
         # Set target
-        self.target_color = []
-        for i in range(5):
-            self.target_color.append(self.color[i])
+        self.target_color = [color for color in self.colors]
 
         # Timestep
         self.timesteps = 0
 
         # State
-        self.state = np.array([0, 0, 0, -1])
+        theta = 2 * np.pi * np.random.random_sample()
+        self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
 
         return self.get_obs()
         
@@ -171,24 +181,24 @@ class FiveTargetColorEnv(gym.Env):
         # Parameters
         screen_size = 600
         world_size = self.max_pos - self.min_pos
-        scale = screen_size/world_size
+        scale = screen_size / world_size
 
         point_size = 15
-        region_size = self.target_size*scale
-	
+        region_size = self.target_size * scale
+
+        # Visualize
+        # -----------------------------------
         if self.viewer is None:
             from gym.envs.classic_control import rendering
             self.viewer = rendering.Viewer(screen_size, screen_size)
-
             self.point_trans = rendering.Transform()
-            #self.region_trans = rendering.Transform()
-            
+
             # draw traget
             for i in range(5):
                 region = rendering.make_circle(region_size)
                 region_trans = rendering.Transform()
                 region_trans.set_translation((self.target_coord[i][0]+1)*scale, (self.target_coord[i][1]+1)*scale)
-                #region.set_color(0.9, 0.9, 0)
+                
                 region.add_attr(region_trans)
                 self.targets.append(region)
                 self.viewer.add_geom(region)
@@ -206,32 +216,19 @@ class FiveTargetColorEnv(gym.Env):
             self.viewer.add_geom(point_head)
 
         # Transform
-        # agebt
+        # -----------------------------------
+        # agent
         xpos, ypos, xface, yface = self.state
         theta = np.arctan2(yface, xface)
         self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
         self.point_trans.set_rotation(theta)
         
         # target
-        #print(len(self.targets))
         for i in range(5):
             r, g, b = self.target_color[i]
             self.targets[i].set_color(r, g, b)
-
-        return self.viewer.render(return_rgb_array = mode=='rgb_array')
+        return self.viewer.render(return_rgb_array = (mode=='rgb_array'))
 
     def close(self):
         if self.viewer:
             self.viewer.close()
-
-
-
-
-
-        
-
-
-
-
-
-
