@@ -10,7 +10,8 @@ class FiveTargetColorEnv(gym.Env):
     }
 
     def __init__(self, idx=0):
-        print("here")
+        self.Debug = False
+
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
@@ -59,7 +60,7 @@ class FiveTargetColorEnv(gym.Env):
         self.target_size = 0.2
 
         # Color Code
-        self.color = np.array([
+        self.colors = np.array([
             [1.0, 0.0, 0.0], 
             [0.0, 1.0, 0.0], 
             [0.0, 0.0, 1.0],
@@ -89,10 +90,12 @@ class FiveTargetColorEnv(gym.Env):
         theta = np.arctan2(yface, xface)
 
         # Simulate
+        # --------------------------------------
         # update facing
         theta = theta + self.rotate_scale*rotate
         xface = np.cos(theta)
         yface = np.sin(theta)
+        
         # update position
         xpos = xpos + xface*self.speed_scale*f_speed
         ypos = ypos + yface*self.speed_scale*f_speed
@@ -101,15 +104,15 @@ class FiveTargetColorEnv(gym.Env):
         self.state = [xpos, ypos, xface, yface]
         self.state = np.clip(self.state, self.low_state, self.high_state)
 
-        # TODO Define reward function
-        # TODO Define done
         done = False
         reward = 0
         xpos, ypos, xface, yface = self.state
+        
         # time penalty(distance)
         vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
         dist = np.linalg.norm(vec)
         reward += -dist
+        
         # hit the target
         for i in range(self.num_targets):
             vec = np.array([xpos-self.target_coord[i][0], ypos-self.target_coord[i][1]])
@@ -117,42 +120,47 @@ class FiveTargetColorEnv(gym.Env):
             if dist < self.target_size:
                 done = True
                 if i == self.task:
-                    print('Right Target')
+                    if self.Debug: print('Right Target')
                     reward += 1
                 else:
-                    print('Wrong Target')
+                    if self.Debug: print('Wrong Target')
                     reward += 0.2
                 break
+        
         # hit the wall
         if not done:
             if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
                 done = True
                 reward += -1
-                print('Hit the Wall')
+                if self.Debug: print('Hit the Wall')
+        
         # times up
         self.timesteps += 1
         if not done and self.timesteps >= self.max_timesteps:
             done = True
             reward += -0.5
-            print('Times Up')
+            if self.Debug: print('Times Up')
 
         return self.get_obs(), reward, done, {}
 
     def reset(self, task=None):
+        def color_code2idx(code):
+            if np.all(code == (1, 0, 0)): return 0
+            if np.all(code == (0, 1, 0)): return 1
+            if np.all(code == (0, 0, 1)): return 2
+            if np.all(code == (1, 0, 1)): return 3
+            if np.all(code == (0, 1, 1)): return 4
         
         # Task
-        if task is None:
-            task = np.random.randint(5)
-        self.task = np.array(task)
+        self.task = np.random.randint(5) if task is None else color_code2idx(task)
+        self.task = np.array(self.task)
         
         # Instruction
-        self.instr = self.color[self.task]
+        self.instr = self.colors[self.task]
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
 
         # Set target
-        self.target_color = []
-        for i in range(5):
-            self.target_color.append(self.color[i])
+        self.target_color = [color for color in self.colors]
 
         # Timestep
         self.timesteps = 0
