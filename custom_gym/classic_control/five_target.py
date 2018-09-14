@@ -40,8 +40,8 @@ class FiveTargetEnv(gym.Env):
 
         # Define Observation Space
         # [xpos, ypos] + instruction
-        self.high_obs = np.concatenate((self.high_state[0:2], self.high_instr))
-        self.low_obs = np.concatenate((self.low_state[0:2], self.low_instr))
+        self.high_obs = np.concatenate((self.high_state, self.high_instr))
+        self.low_obs = np.concatenate((self.low_state, self.low_instr))
 
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
 
@@ -55,6 +55,9 @@ class FiveTargetEnv(gym.Env):
         self.target_coord = [(np.cos(x), np.sin(x)) for x in self.target_coord]
         
         self.target_size = 0.2
+
+        # Arena
+        self.arena_size = 1
 
         # Timestep
         self.max_timesteps = 200
@@ -117,7 +120,8 @@ class FiveTargetEnv(gym.Env):
         
         # hit the wall
         if not done:
-            if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
+            #if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
+            if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
                 done = True
                 reward += -1
                 print('Hit the Wall')
@@ -135,11 +139,13 @@ class FiveTargetEnv(gym.Env):
         
         # Task
         if task is None:
-            task = np.random.randint(5)
+            #task = np.random.random_sample(np.shape(self.low_task))
+            #task = task*(self.high_task-self.low_task)+self.low_task
+            task = np.random.randint(self.num_targets)
         self.task = np.array(task)
         
         # Instruction
-        self.instr = np.zeros(5)
+        self.instr = np.zeros(self.num_targets)
         self.instr[self.task] = 1
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
 
@@ -153,12 +159,13 @@ class FiveTargetEnv(gym.Env):
         self.timesteps = 0
 
         # State
-        self.state = np.array([0, 0, 0, -1])
+        theta = 2*np.pi*np.random.random_sample()
+        self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
 
         return self.get_obs()
         
     def get_obs(self):
-        obs = np.concatenate((self.state[0:2], self.instr))
+        obs = np.concatenate((self.state, self.instr))
         assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
         return obs
 
@@ -167,6 +174,7 @@ class FiveTargetEnv(gym.Env):
         screen_size = 600
         world_size = self.max_pos - self.min_pos
         scale = screen_size/world_size
+        scale *= 0.8
 
         point_size = 15
         region_size = self.target_size*scale
@@ -178,12 +186,23 @@ class FiveTargetEnv(gym.Env):
             self.point_trans = rendering.Transform()
             #self.region_trans = rendering.Transform()
             
+            # draw arena
+            border = rendering.make_circle(self.arena_size*scale*1.1)
+            arena = rendering.make_circle(self.arena_size*scale)
+            arena_trans = rendering.Transform()
+            arena_trans.set_translation(screen_size/2, screen_size/2)
+            border.set_color(0.5, 0.5, 0.5)
+            arena.set_color(0.9, 0.9, 0.9)
+            border.add_attr(arena_trans)
+            arena.add_attr(arena_trans)
+            self.viewer.add_geom(border)
+            self.viewer.add_geom(arena)
+
             # draw traget
-            for i in range(5):
+            for i in range(self.num_targets):
                 region = rendering.make_circle(region_size)
                 region_trans = rendering.Transform()
-                region_trans.set_translation((self.target_coord[i][0]+1)*scale, (self.target_coord[i][1]+1)*scale)
-                #region.set_color(0.9, 0.9, 0)
+                region_trans.set_translation(self.target_coord[i][0]*scale+screen_size/2, self.target_coord[i][1]*scale+screen_size/2)
                 region.add_attr(region_trans)
                 self.targets.append(region)
                 self.viewer.add_geom(region)
@@ -204,11 +223,11 @@ class FiveTargetEnv(gym.Env):
         # agent
         xpos, ypos, xface, yface = self.state
         theta = np.arctan2(yface, xface)
-        self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
+        self.point_trans.set_translation(xpos*scale+screen_size/2, ypos*scale+screen_size/2)
         self.point_trans.set_rotation(theta)
         # target
         #print(len(self.targets))
-        for i in range(5):
+        for i in range(self.num_targets):
             r, g, b = self.target_color[i]
             self.targets[i].set_color(r, g, b)
 
