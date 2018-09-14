@@ -124,7 +124,7 @@ class FiveTargetColorV1Env(gym.Env):
                     reward += 5
                 else:
                     if self.Debug: print('Wrong Target')
-                    reward -= 1
+                    reward -= 3
                 break
         
         # hit the wall
@@ -140,6 +140,7 @@ class FiveTargetColorV1Env(gym.Env):
             done = True
             reward += -3
             if self.Debug: print('Times Up')
+        if done: print(reward)
     
         return self.get_obs(), reward, done, {}
 
