@@ -5,7 +5,7 @@ from gym.spaces import Discrete, Box
 
 from unityagents import UnityEnvironment
 
-class UnityEnvV0():
+class UnityEnvV3():
     def __init__(self, app_name, idx=0, no_graphics=False, recording=True):
         # Unity scene
         self._env = UnityEnvironment(file_name=app_name, worker_id=idx, no_graphics=no_graphics)
@@ -62,7 +62,7 @@ class UnityEnvV0():
         state = info.vector_observations[0][:]
         reward = info.rewards[0]
         done = info.local_done[0]
-        if reward < -0.18 and reward > -0.22: reward = 0.2
+
         exinfo = {
             'episode': {
                 'r': reward,
