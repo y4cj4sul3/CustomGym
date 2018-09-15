@@ -162,7 +162,7 @@ class FiveTargetEnv_v1(gym.Env):
         # State
         #theta = 2*np.pi*np.random.random_sample()
         #self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
-        self.state = np.array([0, 0, 0, 1])
+        self.state = np.array([0, 0, -.5, 1])
 
         return self.get_obs()
         
