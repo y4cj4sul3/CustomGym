@@ -28,14 +28,13 @@ def color_code2fixed(code):
             return i
     ValueError("code not in colors")
 
-class FiveTargetRandColorEnv(gym.Env):
+class FiveTargetRandColorEnv_v2(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
     }
 
     def __init__(self):
-        # -------------------------------------------
         self.Debug = False
         self.counter = 0
         self.success = 0
@@ -52,8 +51,8 @@ class FiveTargetRandColorEnv(gym.Env):
         # Define Spaces
         # -------------------------------------------
         # Define Skill Code
-        self.high_instr = np.ones(self.color_code_dim)
-        self.low_instr = np.zeros(self.color_code_dim)
+        self.high_instr = [1.0] * self.color_code_dim
+        self.low_instr = [0.0] * self.color_code_dim
         self.instr_space = spaces.Box(self.low_instr, self.high_instr, dtype=np.float32)
 
         # Define State Space: [xpos, ypos, xface, yface]
@@ -62,8 +61,8 @@ class FiveTargetRandColorEnv(gym.Env):
         self.state_space = spaces.Box(self.low_state, self.high_state, dtype=np.float32)
 
         # Define Color Distance Space
-        self.high_color_dist = np.array([np.inf] * 5)
-        self.low_color_dist = np.array([-np.inf] * 5)
+        self.high_color_dist = np.array([np.inf] * self.num_targets)
+        self.low_color_dist = np.array([-np.inf] * self.num_targets)
         self.color_dist_space = spaces.Box(self.low_color_dist, self.high_color_dist, dtype=np.float32)
 
         # Define Observation Space : [xpos, ypos, face, yface] + [r_d, g_d, b_d, p_d, c_d] + instruction
@@ -151,7 +150,7 @@ class FiveTargetRandColorEnv(gym.Env):
         # time penalty(distance)
         vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
         dist = np.linalg.norm(vec)
-        reward += -dist * 0.01
+        reward += -dist * 0.1
         
         # hit the target
         for i in range(self.num_targets):
@@ -162,10 +161,10 @@ class FiveTargetRandColorEnv(gym.Env):
                 if i == self.task:
                     if self.Debug: print('Right Target')
                     self.success += 1
-                    reward += 0
+                    reward += 1
                 else:
                     if self.Debug: print('Wrong Target')
-                    reward += -3
+                    reward -= 0.5
                 break
         
         # hit the wall
@@ -173,7 +172,7 @@ class FiveTargetRandColorEnv(gym.Env):
             #if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
             if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
                 done = True
-                reward += -3
+                reward += -1
                 if self.Debug: print('Hit the Wall')
         
         # times up
@@ -207,7 +206,7 @@ class FiveTargetRandColorEnv(gym.Env):
         self.timesteps = 0
 
         # State
-        # theta = color_code2face(self.colors, self.instr) / 360 * 2 * np.pi
+        ### theta = color_code2face(self.colors, self.instr) / 360 * 2 * np.pi
         theta = np.random.random_sample() * 2 * np.pi
         self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
 
@@ -242,8 +241,7 @@ class FiveTargetRandColorEnv(gym.Env):
             self.viewer = rendering.Viewer(screen_size, screen_size)
 
             self.point_trans = rendering.Transform()
-            self.task_target_trans = rendering.Transform()
-            
+            #self.region_trans = rendering.Transform()
             
             # draw arena
             border = rendering.make_circle(self.arena_size*scale*1.1)
@@ -256,7 +254,7 @@ class FiveTargetRandColorEnv(gym.Env):
             arena.add_attr(arena_trans)
             self.viewer.add_geom(border)
             self.viewer.add_geom(arena)
-            
+
             # draw traget
             for i in range(self.num_targets):
                 region = rendering.make_circle(region_size)
@@ -265,13 +263,6 @@ class FiveTargetRandColorEnv(gym.Env):
                 region.add_attr(region_trans)
                 self.targets.append(region)
                 self.viewer.add_geom(region)
-
-            # draw task traget
-            region = rendering.make_circle(region_size * 0.9)
-            region_trans = rendering.Transform()
-            region.add_attr(self.task_target_trans)
-            self.targets.append(region)
-            self.viewer.add_geom(region)     
 
             # draw point
             point = rendering.make_circle(point_size)
@@ -293,15 +284,11 @@ class FiveTargetRandColorEnv(gym.Env):
         theta = np.arctan2(yface, xface)
         self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
         self.point_trans.set_rotation(theta)
-        self.task_target_trans.set_translation(self.target_coord[self.task][0]*scale+screen_size/2, self.target_coord[self.task][1]*scale+screen_size/2)
         
         # target
         for i in range(5):
             r, g, b = self.target_color[i]
             self.targets[i].set_color(r, g, b)
-        r, g, b = self.target_color[self.task]
-        self.targets[self.task].set_color(1.0, 0.8, 0.0)
-        self.targets[self.num_targets].set_color(r, g, b)
 
         return self.viewer.render(return_rgb_array = (mode=='rgb_array'))
 
