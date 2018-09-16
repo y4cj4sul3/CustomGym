@@ -7,8 +7,13 @@ custom_gym.egg-info
 # Unity executable
 custom_gym/unity/assets
 
-# tmp mujoco
-custom_gym/mujoco/
+# MuJoCo
+custom_gym/mujoco/*
+!custom_gym/mujoco/__init__.py
+!custom_gym/mujoco/reacher.py
+!custom_gym/mujoco/assets
+custom_gym/mujoco/assets/*
+!custom_gym/mujoco/assets/reacher.xml
 
 # IOS stuff
 .DS_Store
