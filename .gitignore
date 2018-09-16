@@ -12,6 +12,7 @@ custom_gym/mujoco/*
 !custom_gym/mujoco/__init__.py
 !custom_gym/mujoco/mujoco_env.py
 !custom_gym/mujoco/reacher.py
+!custom_gym/mujoco/reacher_gep.py
 !custom_gym/mujoco/assets
 custom_gym/mujoco/assets/*
 !custom_gym/mujoco/assets/reacher.xml
