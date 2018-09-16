@@ -23,8 +23,32 @@ register(
 )
 
 register(
+    id='FiveTarget-v1',
+    entry_point='custom_gym.classic_control:FiveTargetEnv_v1',
+    max_episode_steps=200,
+)
+
+register(
     id='FiveTargetColor-v0',
     entry_point='custom_gym.classic_control:FiveTargetColorEnv',
+    max_episode_steps=200,
+)
+
+register(
+    id='FiveTargetColor-v1',
+    entry_point='custom_gym.classic_control:FiveTargetColorV1Env',
+    max_episode_steps=200,
+)
+
+register(
+    id='FiveTargetRandColor-v0',
+    entry_point='custom_gym.classic_control:FiveTargetRandColorEnv',
+    max_episode_steps=200,
+)
+
+register(
+    id='FiveTargetRandColor-v2',
+    entry_point='custom_gym.classic_control:FiveTargetRandColorEnv_v2',
     max_episode_steps=200,
 )
 
@@ -34,3 +58,14 @@ register(
     entry_point='custom_gym.unity:KobukiEnv',
     
 )
+
+# mujoco
+
+register(
+    id='ReacherEx-v0',
+    entry_point='custom_gym.mujoco:ReacherEnv',
+    max_episode_steps=50,
+    reward_threshold=-3.75,
+)
+
+

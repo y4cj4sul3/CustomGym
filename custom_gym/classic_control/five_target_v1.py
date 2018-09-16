@@ -3,7 +3,7 @@ from gym import spaces
 from gym.utils import seeding
 import numpy as np
 
-class FiveTargetEnv(gym.Env):
+class FiveTargetEnv_v1(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -40,8 +40,8 @@ class FiveTargetEnv(gym.Env):
 
         # Define Observation Space
         # [xpos, ypos] + instruction
-        self.high_obs = np.concatenate((self.high_state, self.high_instr))
-        self.low_obs = np.concatenate((self.low_state, self.low_instr))
+        self.high_obs = np.concatenate((self.high_state[0:2], self.high_instr))
+        self.low_obs = np.concatenate((self.low_state[0:2], self.low_instr))
 
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
 
@@ -50,11 +50,12 @@ class FiveTargetEnv(gym.Env):
 
         # Target
         self.targets = []
-        self.target_coord = [18, 90, 162, 234, 306]
+        self.target_coord = range(18, 180, 36)
         self.target_coord = [np.deg2rad(x) for x in self.target_coord]
         self.target_coord = [(np.cos(x), np.sin(x)) for x in self.target_coord]
-        
-        self.target_size = 0.2
+        print(self.target_coord)
+
+        self.target_size = 0.05
 
         # Arena
         self.arena_size = 1
@@ -120,8 +121,8 @@ class FiveTargetEnv(gym.Env):
         
         # hit the wall
         if not done:
-            #if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
-            if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
+            if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
+            #if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
                 done = True
                 reward += -1
                 print('Hit the Wall')
@@ -159,13 +160,16 @@ class FiveTargetEnv(gym.Env):
         self.timesteps = 0
 
         # State
-        theta = 2*np.pi*np.random.random_sample()
-        self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
+        #theta = 2*np.pi*np.random.random_sample()
+        #self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
+        self.state = np.array([0, -.5, 0, 1])
 
         return self.get_obs()
         
     def get_obs(self):
-        obs = np.concatenate((self.state, self.instr))
+        # Observation
+        # [agent coord] + instruction
+        obs = np.concatenate((self.state[0:2], self.instr))
         assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
         return obs
 
@@ -174,7 +178,7 @@ class FiveTargetEnv(gym.Env):
         screen_size = 600
         world_size = self.max_pos - self.min_pos
         scale = screen_size/world_size
-        scale *= 0.8
+        #scale *= 0.8
 
         point_size = 15
         region_size = self.target_size*scale
@@ -185,7 +189,7 @@ class FiveTargetEnv(gym.Env):
 
             self.point_trans = rendering.Transform()
             #self.region_trans = rendering.Transform()
-            
+            '''            
             # draw arena
             border = rendering.make_circle(self.arena_size*scale*1.1)
             arena = rendering.make_circle(self.arena_size*scale)
@@ -197,7 +201,7 @@ class FiveTargetEnv(gym.Env):
             arena.add_attr(arena_trans)
             self.viewer.add_geom(border)
             self.viewer.add_geom(arena)
-
+            '''
             # draw traget
             for i in range(self.num_targets):
                 region = rendering.make_circle(region_size)
