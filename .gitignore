@@ -6,5 +6,10 @@ custom_gym.egg-info
 
 # Unity executable
 custom_gym/unity/assets
+
+# tmp mujoco
+custom_gym/mujoco/
+
+# IOS stuff
 .DS_Store
 ._.DS_Store

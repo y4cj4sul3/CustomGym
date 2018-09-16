@@ -31,11 +31,12 @@ class Recoder:
         self.step(state, action)
         
         # save file
-        with open(self.file_path+'traj_{}.json'.format(self.count), 'w') as fp:
-            json.dump(self.traj, fp, indent=2)
-        print('Save file: ' + self.file_path + 'traj_{}.json'.format(self.count))
+        if len(self.traj['state']) > 10:
+            with open(self.file_path+'traj_{}.json'.format(self.count), 'w') as fp:
+                json.dump(self.traj, fp, indent=2)
+            print('Save file: ' + self.file_path + 'traj_{}.json'.format(self.count))
 
-        self.count += 1
+            self.count += 1
 
         # reset
         self.reset_traj()
