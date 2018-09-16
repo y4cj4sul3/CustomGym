@@ -29,5 +29,9 @@ register(
 
 register(
     id='ReacherEx-v0',
-    entry_point='custom_gym.mujoco:ReacherEnv'
+    entry_point='custom_gym.mujoco:ReacherEnv',
+    max_episode_steps=50,
+    reward_threshold=-3.75,
 )
+
+
