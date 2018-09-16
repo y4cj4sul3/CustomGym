@@ -13,7 +13,12 @@ register(
     id='MassPoint-v0',
     entry_point='custom_gym.classic_control:MassPointEnv',
     max_episode_steps=200,
+)
 
+register(
+    id='MassPoint-v1',
+    entry_point='custom_gym.classic_control:MassPointEnv_v1',
+    max_episode_steps=200,
 )
 
 register(
@@ -25,6 +30,12 @@ register(
 register(
     id='FiveTarget-v1',
     entry_point='custom_gym.classic_control:FiveTargetEnv_v1',
+    max_episode_steps=200,
+)
+
+register(
+    id='FiveTarget-v2',
+    entry_point='custom_gym.classic_control:FiveTargetEnv_v2',
     max_episode_steps=200,
 )
 
