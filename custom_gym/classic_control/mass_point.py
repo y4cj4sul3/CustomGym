@@ -2,6 +2,7 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import numpy as np
+from getch import getch, pause
 
 class MassPointEnv(gym.Env):
     metadata = {
@@ -13,8 +14,10 @@ class MassPointEnv(gym.Env):
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
-        self.speed_scale = 0.01
-        self.rotate_scale = 0.3
+        self.speed_scale = 0.3
+        self.rotate_scale = 0.5
+        self.done = False
+        self.task = None
         
         # Define Task Space
         self.high_task = np.array([1, 1])
@@ -28,16 +31,27 @@ class MassPointEnv(gym.Env):
         self.low_action = np.array([0, -1])
         
         self.action_space = spaces.Box(self.low_action, self.high_action, dtype=np.float32)
+        
+        # Define State Space
+        # [xpos, ypos, xface, yface]
+        self.high_state = np.array([1, 1, 1, 1])
+        self.low_state = -self.high_state
+        
+        self.state_space = spaces.Box(self.low_state, self.high_state, dtype=np.float32)
 
         # Define Observation Space
         # [xpos, ypos, xface, yface] + task
-        self.high_obs = np.concatenate(([1, 1, 1, 1], self.high_task))
-        self.low_obs = np.concatenate(([-1, -1, -1, -1], self.low_task))
+        self.high_obs = self.high_task
+        self.low_obs = self.low_task
 
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
 
         # Reset Env
         self.viewer = None
+
+        # Timestep
+        self.max_timesteps = 200
+        self.timesteps = 0
 
         self.seed()
         self.reset()
@@ -47,58 +61,92 @@ class MassPointEnv(gym.Env):
         return [seed]
 
     def step(self, action):
-        # Check action
-        #print(action)
+        '''Step reward'''
+        reward = 0
+
+        '''Check action'''
+        # take action
+        #print(str(action))
         action = np.clip(action, self.low_action, self.high_action)
         assert self.action_space.contains(action), "%r (%s) invalid action" % (action, type(action))
         
         # States before simulate
-        xpos, ypos, xface, yface = self.obs[0:4]
+        xpos, ypos, xface, yface = self.state
         f_speed, rotate = action
         theta = np.arctan2(yface, xface)
 
-        # Simulate
-        # update facing
+        '''Reward'''
+        # time penalty(distance)
+        #vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
+        #dist = np.linalg.norm(vec)
+        #reward += -dist
+
+        # check if hit the target point
+        hit = 0
+        if abs(xpos - self.task[0]) <= self.speed_scale/2 and abs(ypos - self.task[1]) <= self.speed_scale/2:
+            hit = 1
+            self.done = True
+            reward += 1
+            print('Success')
+        # hit the wall
+        if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
+            hit = -1
+            self.done = True
+            reward += -1
+            print('Hit the Wall')
+
+        '''Simulate'''
+        # step facing
         theta = theta + self.rotate_scale*rotate
         xface = np.cos(theta)
         yface = np.sin(theta)
-        # update position
+        # step position
         xpos = xpos + xface*self.speed_scale*f_speed
         ypos = ypos + yface*self.speed_scale*f_speed
 
+        '''Update'''
         # States after simulate
-        self.obs = [xpos, ypos, xface, yface]
-        self.obs = np.concatenate((self.obs, self.task))
-        self.obs = np.clip(self.obs, self.low_obs, self.high_obs)
+        self.state = [xpos, ypos, xface, yface]
+        self.state = np.clip(self.state, self.low_state, self.high_state)
+        # time
+        self.timesteps += 1
 
-        # TODO Define reward function
-        reward = 0
-        dist = np.sqrt(np.sum(np.power(self.obs[0:2]-self.task, 2)))
-        reward = 1-dist
-        '''
-	if dist < 0.1:
-            reward += 2-dist*10
-	'''
+        # check max time step : times up
+        if not self.done and self.timesteps >= self.max_timesteps:
+            self.done = True
+            reward += -0.5
+            print('Times Up')
 
-        # TODO Define done
-        done = False
-
-        return self.obs, reward, done, {}
+        return self.get_obs(), reward, self.done, {'hit':hit, 't':self.timesteps}
 
     def reset(self, task=None):
-        
         # Task
         if task is None:
-            task = np.random.random_sample(np.shape(self.low_task))
-            task = task*(self.high_task-self.low_task)+self.low_task
-        assert self.task_space.contains(task), "%r (%s) invalid task" % (task, type(task))
-        self.task = np.array(task)
+            #self.task = np.random.random_sample(np.shape(self.low_task))
+            #self.task = self.task*(self.high_task-self.low_task)+self.low_task
+            self.task = np.random.uniform(0, 1, (2,))
+            #print('self_task:' + str(self.task))
+        else:
+            self.task = np.array(task)
+            #print('engineer_task:' + str(task))
+        assert self.task_space.contains(self.task), "%r (%s) invalid task" % (self.task, type(self.task))
 
         # State
-        theta = 2*np.pi*np.random.rand()
-        self.obs = np.concatenate(([0, 0, np.cos(theta), np.sin(theta)], self.task))
+        #self.state = np.array([0, -0.5, np.sin(np.deg2rad(45)), np.cos(np.deg2rad(45))])
+        self.state = np.array([0, -0.5, 0, 1])
 
-        return self.obs
+        # Timestep
+        self.timesteps = 0
+
+        # Parameter
+        self.done = False
+
+        return self.get_obs()
+
+    def get_obs(self):
+        obs = self.state[0:2]
+        assert self.observation_space.contains(obs), "%r (%s) invalid obs" % (obs, type(obs))
+        return obs
 
     def render(self, mode='human'):
         # Parameters
@@ -135,7 +183,7 @@ class MassPointEnv(gym.Env):
             self.viewer.add_geom(point_head)
 
         # Transform
-        xpos, ypos, xface, yface = self.obs[0:4]
+        xpos, ypos, xface, yface = self.state[0:4]
         theta = np.arctan2(yface, xface)
         self.point_trans.set_translation((xpos+1)*scale, (ypos+1)*scale)
         self.point_trans.set_rotation(theta)
@@ -147,16 +195,3 @@ class MassPointEnv(gym.Env):
     def close(self):
         if self.viewer:
             self.viewer.close()
-
-
-
-
-
-
-        
-
-
-
-
-
-
