@@ -31,7 +31,8 @@ class ReacherGEPEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def reset_model(self):
         # Position
         # [arm_angle_1, arm_angle_2, target_xpos, target_ypos]
-        qpos = self.np_random.uniform(low=-0.1, high=0.1, size=self.model.nq) + self.init_qpos
+        #qpos = self.np_random.uniform(low=-0.1, high=0.1, size=self.model.nq) + self.init_qpos
+        qpos = self.init_qpos
         while True:
             self.goal = self.np_random.uniform(low=-.2, high=.2, size=2)
             if np.linalg.norm(self.goal) < 2:
@@ -40,7 +41,8 @@ class ReacherGEPEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         # Velocity
         # [arm_aglvel_1, arm_aglvec_2, target_xvel, target_yvel]
-        qvel = self.init_qvel + self.np_random.uniform(low=-.005, high=.005, size=self.model.nv)
+        #qvel = self.init_qvel + self.np_random.uniform(low=-.005, high=.005, size=self.model.nv)
+        qvel = self.init_qvel
         qvel[-2:] = 0
 
         # State
