@@ -9,6 +9,7 @@ from custom_gym.mujoco.mujoco_env import MujocoEnv
 #from gym.envs.mujoco.inverted_pendulum import InvertedPendulumEnv
 #from gym.envs.mujoco.inverted_double_pendulum import InvertedDoublePendulumEnv
 from custom_gym.mujoco.reacher import ReacherEnv
+from custom_gym.mujoco.reacher_gep import ReacherGEPEnv
 #from gym.envs.mujoco.swimmer import SwimmerEnv
 #from gym.envs.mujoco.humanoidstandup import HumanoidStandupEnv
 #from gym.envs.mujoco.pusher import PusherEnv

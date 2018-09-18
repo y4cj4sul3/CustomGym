@@ -3,7 +3,7 @@ from gym import utils
 #from gym.envs.mujoco import mujoco_env
 from custom_gym.mujoco import mujoco_env
 
-class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherGEPEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher.xml', 2)
@@ -59,7 +59,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return np.concatenate([
             np.cos(theta),
             np.sin(theta),
-            self.sim.data.qpos.flat[2:],
+            #self.sim.data.qpos.flat[2:],
             self.sim.data.qvel.flat[:2],
-            self.get_body_com("fingertip") - self.get_body_com("target")
+            #self.get_body_com("fingertip") - self.get_body_com("target")
         ])
