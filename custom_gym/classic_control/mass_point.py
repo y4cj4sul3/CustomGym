@@ -14,8 +14,8 @@ class MassPointEnv(gym.Env):
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
-        self.speed_scale = 0.3
-        self.rotate_scale = 0.5
+        self.speed_scale = 0.1
+        self.rotate_scale = 0.1
         self.done = False
         self.task = None
         
@@ -124,7 +124,7 @@ class MassPointEnv(gym.Env):
         if task is None:
             #self.task = np.random.random_sample(np.shape(self.low_task))
             #self.task = self.task*(self.high_task-self.low_task)+self.low_task
-            self.task = np.random.uniform(0, 1, (2,))
+            self.task = np.random.uniform(-1, 1, (2,))
             #print('self_task:' + str(self.task))
         else:
             self.task = np.array(task)
