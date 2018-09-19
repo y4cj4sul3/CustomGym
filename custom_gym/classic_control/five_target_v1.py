@@ -105,6 +105,7 @@ class FiveTargetEnv_v1(gym.Env):
         dist = np.linalg.norm(vec)
         reward += -dist * 0.1
         
+        done_status = ''
         # hit the target
         for i in range(self.num_targets):
             vec = np.array([xpos-self.target_coord[i][0], ypos-self.target_coord[i][1]])
@@ -113,9 +114,11 @@ class FiveTargetEnv_v1(gym.Env):
                 done = True
                 if i == self.task:
                     print('Right Target')
+                    done_status = 'Right Target'
                     reward += 1
                 else:
                     print('Wrong Target')
+                    done_status = 'Wrong Target'
                     reward += -0.2
                 break
         
@@ -126,6 +129,7 @@ class FiveTargetEnv_v1(gym.Env):
                 done = True
                 reward += -1
                 print('Hit the Wall')
+                done_status = 'Hit the Wall'
         
         # times up
         self.timesteps += 1
@@ -133,8 +137,9 @@ class FiveTargetEnv_v1(gym.Env):
             done = True
             reward += -0.5
             print('Times Up')
+            done_status = 'Times Up'
 
-        return self.get_obs(), reward, done, {}
+        return self.get_obs(), reward, done, {'done_status': done_status}
 
     def reset(self, task=None):
         
