@@ -6,8 +6,10 @@ from custom_gym.utils import Recoder
 class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
-        #self.target_id = np.random.randint(3)
         self.set_target()
+        # timestep
+        self.max_timesteps = 50
+        self.timesteps = 0
         '''
         # recorder
         self.recorder = Recoder('Log/SkillRL/a2c_1e6/')
@@ -33,9 +35,10 @@ class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # after sim
         ob = self._get_obs()
 
-        # check contact
+        # check done
         done = False
-        # contact
+        done_status = ''
+        # collision detection
         if self.data.ncon > 0:
             done = True
             #print('=========Contact========')
@@ -47,12 +50,23 @@ class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
                 if con.geom2 == 9:
                     print('Right Target')
-                    reward += 0
+                    done_status = 'Right Target'
+                    reward += 1
+                '''
+                # currently only true target can be detect
                 else:
                     print('Wrong Target')
                     reward += -0
+                '''
+        # times up
+        self.timesteps += 1
+        if not done and self.timesteps >= self.max_timesteps:
+            done = True
+            reward += -0.5
+            print('Times Up')
+            done_status = 'Times Up'
 
-        return ob, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl)
+        return ob, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl, done_status=done_status)
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
@@ -65,14 +79,17 @@ class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.target_id = target_id
         print('Current Target: {}'.format(self.target_id))
 
-        # target one hot
+        # instruction (one-hot)
         self.target_one_hot = np.zeros(5)
         self.target_one_hot[self.target_id] = 1
 
     def reset_model(self, target_id=None):
         # random init target
-        #self.target_id = np.random.randint(3)
         self.set_target(target_id)
+        
+        # timestep
+        self.timesteps = 0
+
         '''
         # save traj
         self.recorder.save()
