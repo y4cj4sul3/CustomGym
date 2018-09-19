@@ -13,9 +13,11 @@ custom_gym/mujoco/*
 !custom_gym/mujoco/mujoco_env.py
 !custom_gym/mujoco/reacher.py
 !custom_gym/mujoco/reacher_gep.py
+!custom_gym/mujoco/reacher_five_target.py
 !custom_gym/mujoco/assets
 custom_gym/mujoco/assets/*
 !custom_gym/mujoco/assets/reacher.xml
+!custom_gym/mujoco/assets/reacher_five_target.xml
 
 # IOS stuff
 .DS_Store
