@@ -2,9 +2,8 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import numpy as np
-from getch import getch, pause
 
-class MassPointEnv(gym.Env):
+class MassPointGEPEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -14,14 +13,14 @@ class MassPointEnv(gym.Env):
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
-        self.speed_scale = 0.1
-        self.rotate_scale = 0.1
-        self.done = False
+        self.speed_scale = 0.05
+        self.rotate_scale = 0.3
+        self.task_dim = 2
         self.task = None
         
         # Define Task Space
-        self.high_task = np.array([1, 1])
-        self.low_task = np.array([-1, -1])
+        self.high_task = np.ones(self.task_dim)
+        self.low_task = -self.high_task
         
         self.task_space = spaces.Box(self.low_task, self.high_task, dtype=np.float32)
 
@@ -41,10 +40,13 @@ class MassPointEnv(gym.Env):
 
         # Define Observation Space
         # [xpos, ypos, xface, yface] + task
-        self.high_obs = self.high_task
-        self.low_obs = self.low_task
+        self.high_obs = self.high_state
+        self.low_obs = self.low_state
 
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
+        
+        # Target
+        self.target_size = 0.05
 
         # Reset Env
         self.viewer = None
@@ -61,9 +63,6 @@ class MassPointEnv(gym.Env):
         return [seed]
 
     def step(self, action):
-        '''Step reward'''
-        reward = 0
-
         '''Check action'''
         # take action
         #print(str(action))
@@ -74,27 +73,7 @@ class MassPointEnv(gym.Env):
         xpos, ypos, xface, yface = self.state
         f_speed, rotate = action
         theta = np.arctan2(yface, xface)
-
-        '''Reward'''
-        # time penalty(distance)
-        #vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
-        #dist = np.linalg.norm(vec)
-        #reward += -dist
-
-        # check if hit the target point
-        hit = 0
-        if abs(xpos - self.task[0]) <= self.speed_scale/2 and abs(ypos - self.task[1]) <= self.speed_scale/2:
-            hit = 1
-            self.done = True
-            reward += 1
-            print('Success')
-        # hit the wall
-        if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
-            hit = -1
-            self.done = True
-            reward += -1
-            print('Hit the Wall')
-
+        
         '''Simulate'''
         # step facing
         theta = theta + self.rotate_scale*rotate
@@ -108,16 +87,40 @@ class MassPointEnv(gym.Env):
         # States after simulate
         self.state = [xpos, ypos, xface, yface]
         self.state = np.clip(self.state, self.low_state, self.high_state)
+
+        '''Reward'''
+        # time penalty(distance)
+        #vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
+        #dist = np.linalg.norm(vec)
+        #reward += -dist:
+        # check if hit the target point
+        xpos, ypos, xface, yface = self.state
+        
+        reward = 0
+        hit = 0
+        done = False
+        #if abs(xpos - self.task[0]) <= self.target_size and abs(ypos - self.task[1]) <= self.target_size:
+        if np.linalg.norm([xpos-self.task[0], ypos-self.task[1]]) < self.target_size:
+            hit = 1
+            done = True
+            reward += 1
+            print('Success')
+        # hit the wall
+        if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
+            hit = -1
+            done = True
+            reward += -1
+            print('Hit the Wall')
+
         # time
         self.timesteps += 1
-
         # check max time step : times up
-        if not self.done and self.timesteps >= self.max_timesteps:
-            self.done = True
+        if not done and self.timesteps >= self.max_timesteps:
+            done = True
             reward += -0.5
             print('Times Up')
 
-        return self.get_obs(), reward, self.done, {'hit':hit, 't':self.timesteps}
+        return self.get_obs(), reward, done, {'hit':hit, 't':self.timesteps}
 
     def reset(self, task=None):
         # Task
@@ -138,13 +141,10 @@ class MassPointEnv(gym.Env):
         # Timestep
         self.timesteps = 0
 
-        # Parameter
-        self.done = False
-
         return self.get_obs()
 
     def get_obs(self):
-        obs = self.state[0:2]
+        obs = self.state
         assert self.observation_space.contains(obs), "%r (%s) invalid obs" % (obs, type(obs))
         return obs
 
@@ -154,8 +154,8 @@ class MassPointEnv(gym.Env):
         world_size = self.max_pos - self.min_pos
         scale = screen_size/world_size
 
-        point_size = 5
-        region_size = 0.1*scale
+        point_size = 15
+        region_size = self.target_size*scale
 
         if self.viewer is None:
             from gym.envs.classic_control import rendering
