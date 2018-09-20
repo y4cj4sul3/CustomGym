@@ -139,7 +139,7 @@ class FiveTargetEnv_v1(gym.Env):
             print('Times Up')
             done_status = 'Times Up'
 
-        return self.get_obs(), reward, done, {'done_status': done_status}
+        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
 
     def reset(self, task=None):
         
