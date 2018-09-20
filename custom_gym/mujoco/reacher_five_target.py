@@ -11,8 +11,9 @@ class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.max_timesteps = 50
         self.timesteps = 0
         '''
+        self.hit = False
         # recorder
-        self.recorder = Recoder('Log/SkillRL/a2c_1e6/')
+        self.recorder = Recoder('Dataset/ReacherFiveTarget-v0/ppo2_2e6/')
         self.recorder.traj['reward'] = 0
         '''
         utils.EzPickle.__init__(self)
@@ -36,11 +37,13 @@ class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         ob = self._get_obs()
 
         # check done
+        #done = self.hit
         done = False
         done_status = ''
         # collision detection
         if self.data.ncon > 0:
             done = True
+            #self.hit = True
             #print('=========Contact========')
             for coni in range(self.data.ncon):
                 #print('--------{}--------'.format(coni))
@@ -65,8 +68,8 @@ class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             reward += -0.5
             print('Times Up')
             done_status = 'Times Up'
-
-        return ob, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl, done_status=done_status)
+        
+        return ob, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl, done_status=done_status, coord=self.get_body_com('fingertip'))
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
@@ -91,6 +94,7 @@ class ReacherFiveTargetEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.timesteps = 0
 
         '''
+        self.hit = False
         # save traj
         self.recorder.save()
         # reset traj
