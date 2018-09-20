@@ -87,3 +87,10 @@ register(
     max_episode_steps = 50,
     reward_threshold=-3.75,
 )
+
+register(
+    id='ReacherFiveTarget-v1',
+    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v1',
+    max_episode_steps = 50,
+    reward_threshold=-3.75,
+)
