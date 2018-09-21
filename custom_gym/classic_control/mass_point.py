@@ -17,11 +17,12 @@ class MassPointEnv(gym.Env):
         self.speed_scale = 0.1
         self.rotate_scale = 0.1
         self.done = False
+        self.mid_done = False
         self.task = None
         
         # Define Task Space
-        self.high_task = np.array([1, 1])
-        self.low_task = np.array([-1, -1])
+        self.high_task = np.array([1, 1, 1, 1])
+        self.low_task = np.array([-1, -1, -1, -1])
         
         self.task_space = spaces.Box(self.low_task, self.high_task, dtype=np.float32)
 
@@ -41,8 +42,8 @@ class MassPointEnv(gym.Env):
 
         # Define Observation Space
         # [xpos, ypos, xface, yface] + task
-        self.high_obs = self.high_task
-        self.low_obs = self.low_task
+        self.high_obs = self.high_task[0:2]
+        self.low_obs = self.low_task[0:2]
 
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
 
@@ -83,7 +84,7 @@ class MassPointEnv(gym.Env):
 
         # check if hit the target point
         hit = 0
-        if abs(xpos - self.task[0]) <= self.speed_scale/2 and abs(ypos - self.task[1]) <= self.speed_scale/2:
+        if abs(xpos - self.task[-2]) <= self.speed_scale/2 and abs(ypos - self.task[-1]) <= self.speed_scale/2 and self.mid_done:
             hit = 1
             self.done = True
             reward += 1
@@ -129,7 +130,7 @@ class MassPointEnv(gym.Env):
         else:
             self.task = np.array(task)
             #print('engineer_task:' + str(task))
-        assert self.task_space.contains(self.task), "%r (%s) invalid task" % (self.task, type(self.task))
+        #assert self.task_space.contains(self.task), "%r (%s) invalid task" % (self.task, type(self.task))
 
         # State
         #self.state = np.array([0, -0.5, np.sin(np.deg2rad(45)), np.cos(np.deg2rad(45))])
@@ -140,6 +141,7 @@ class MassPointEnv(gym.Env):
 
         # Parameter
         self.done = False
+        self.mid_done = False
 
         return self.get_obs()
 

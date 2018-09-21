@@ -13,7 +13,12 @@ register(
     id='MassPoint-v0',
     entry_point='custom_gym.classic_control:MassPointEnv',
     max_episode_steps=200,
+)
 
+register(
+    id='MassPointTraj-v0',
+    entry_point='custom_gym.classic_control:MassPointTrajEnv',
+    max_episode_steps=200,
 )
 
 register(
@@ -71,6 +76,13 @@ register(
 register(
     id='ReacherGEP-v0',
     entry_point='custom_gym.mujoco:ReacherGEPEnv',
+    max_episode_steps=50,
+    reward_threshold=-3.75,
+)
+
+register(
+    id='ReacherGEPTraj-v0',
+    entry_point='custom_gym.mujoco:ReacherGEPTrajEnv',
     max_episode_steps=50,
     reward_threshold=-3.75,
 )
