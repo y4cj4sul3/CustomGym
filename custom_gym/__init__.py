@@ -69,6 +69,12 @@ register(
     max_episode_steps=200,
 )
 
+register(
+    id = 'OverCooked-v0',
+    entry_point='custom_gym.classic_control:OverCookedEnv',
+    max_episode_steps=200,
+)
+
 # unity
 register(
     id='Kobuki-v0',
