@@ -201,6 +201,7 @@ class FiveTargetEnv_v1(gym.Env):
                 done = True
                 reward += -1
                 print('Hit the Wall')
+                done_status = 'Hit the Wall'
         
         # times up
         self.timesteps += 1
@@ -208,8 +209,9 @@ class FiveTargetEnv_v1(gym.Env):
             done = True
             reward += -0.5
             print('Times Up')
+            done_status = 'Times Up'
 
-        return self.get_obs(), reward, done, {}
+        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
 
     def reset(self, task=None):
         # Task

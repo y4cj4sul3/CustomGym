@@ -11,6 +11,8 @@ from custom_gym.mujoco.mujoco_env import MujocoEnv
 from custom_gym.mujoco.reacher import ReacherEnv
 from custom_gym.mujoco.reacher_gep import ReacherGEPEnv
 from custom_gym.mujoco.reacher_gep_traj import ReacherGEPTrajEnv
+from custom_gym.mujoco.reacher_five_target import ReacherFiveTargetEnv
+from custom_gym.mujoco.reacher_five_target_v1 import ReacherFiveTargetEnv_v1
 #from gym.envs.mujoco.swimmer import SwimmerEnv
 #from gym.envs.mujoco.humanoidstandup import HumanoidStandupEnv
 #from gym.envs.mujoco.pusher import PusherEnv
