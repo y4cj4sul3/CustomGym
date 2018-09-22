@@ -33,9 +33,9 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         dist1 = np.linalg.norm(vec1)
         dist2 = np.linalg.norm(vec2)
         if num_task_left == 2:
-            dist = dist2
-        else:
             dist = dist1
+        else:
+            dist = dist2
         reward_dist = - dist
         reward_ctrl = - np.square(a).sum()
         reward = reward_dist + reward_ctrl
@@ -93,7 +93,7 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.target_id = [np.random.randint(2), 2+np.random.randint(5)]
         else:
             self.target_id = target_id
-        print('Current Target: {}'.format(self.target_id))
+        #print('Current Target: {}'.format(self.target_id))
 
         # instruction (one-hot)
         self.instr = np.zeros(7)
