@@ -12,11 +12,19 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.timesteps = 0
         
         # recorder
+<<<<<<< HEAD
         import os
         os.makedirs('Dataset/ReacherFiveTarget-v1/ppo2_2e5', exist_ok=True)
         self.recorder = Recoder('Dataset/ReacherFiveTarget-v1/ppo2_2e5/')
         self.recorder.traj['reward'] = 0
         self.recorder.traj['coord'] = []
+=======
+        self.is_record = False
+        if self.is_record:
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v0/test/')
+            self.recorder.traj['reward'] = 0
+            self.recorder.traj['coord'] = []
+>>>>>>> fc42a82413fc90153d01a159cc17bd6897096e5a
         
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher_over_cooked.xml', 2)
@@ -41,6 +49,9 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         reward_dist = - dist
         reward_ctrl = - np.square(a).sum()
         reward = reward_dist + reward_ctrl
+
+        # task
+        reward += -0.4*(num_task_left-1)
 
         # check done
         done = False
@@ -73,6 +84,7 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             done_status = 'Times Up'
         
         # record
+<<<<<<< HEAD
         self.recorder.step(self._get_obs(), a)
         #if hasattr(self.recorder.traj, 'reward'):
         self.recorder.traj['reward'] += reward
@@ -80,6 +92,16 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         if done_status == 'Finish Task':
         # if done:
             self.recorder.save()
+=======
+        if self.is_record:
+            self.recorder.step(self._get_obs(), a)
+            #if hasattr(self.recorder.traj, 'reward'):
+            self.recorder.traj['reward'] += reward
+            self.recorder.traj['coord'].append(self.get_body_com("fingertip").tolist())
+            #if done_status == 'Right Target':
+            if done:
+                self.recorder.save()
+>>>>>>> fc42a82413fc90153d01a159cc17bd6897096e5a
         
         # get obs
         ob = self._get_obs()
@@ -126,6 +148,7 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         self.set_state(qpos, qvel)
         
+<<<<<<< HEAD
         # save traj
         #self.recorder.save()
         # reset traj
@@ -134,6 +157,18 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.recorder.traj['coord'] = []
         # save first step
         self.recorder.step(self._get_obs())
+=======
+        # recorder
+        if self.is_record:
+            # save traj
+            #self.recorder.save()
+            # reset traj
+            self.recorder.reset_traj()
+            self.recorder.traj['reward'] = 0
+            self.recorder.traj['coord'] = []
+            # save first step
+            self.recorder.step(self._get_obs())
+>>>>>>> fc42a82413fc90153d01a159cc17bd6897096e5a
         
         return self._get_obs()
 
