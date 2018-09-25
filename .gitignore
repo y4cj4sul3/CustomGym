@@ -16,6 +16,7 @@ custom_gym/mujoco/*
 !custom_gym/mujoco/reacher_five_target.py
 !custom_gym/mujoco/reacher_five_target_v1.py
 !custom_gym/mujoco/reacher_over_cooked.py
+!custom_gym/mujoco/reacher_over_cooked_v1.py
 !custom_gym/mujoco/assets
 custom_gym/mujoco/assets/*
 !custom_gym/mujoco/assets/reacher.xml
