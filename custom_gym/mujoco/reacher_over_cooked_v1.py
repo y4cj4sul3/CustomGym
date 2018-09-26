@@ -76,19 +76,27 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
             done_status = 'Times Up'
         
         # record
+        min_dist_cp = 0
+        min_dist_ft = 0
         if self.is_record:
             self.recorder.step(self._get_obs(), a)
             #if hasattr(self.recorder.traj, 'reward'):
             self.recorder.traj['reward'] += reward
             self.recorder.traj['coord'].append(self.get_body_com("fingertip").tolist())
-            #if done_status == 'Right Target':
+            #if done_status == 'Finish Task':
             if done:
+                # find dist closest to checkpoint
+                ctcp = np.argmin(np.linalg.norm(np.array(self.recorder.traj['coord'])-self.get_body_com('checkpoint'), axis=1))
+                ctft = ctcp+np.argmin(np.linalg.norm(np.array(self.recorder.traj['coord'])[ctcp:]-self.get_body_com('true_target'), axis=1))
+                min_dist_cp = np.linalg.norm(np.array(self.recorder.traj['coord'][ctcp]-self.get_body_com('checkpoint')))
+                min_dist_ft = np.linalg.norm(np.array(self.recorder.traj['coord'][ctft]-self.get_body_com('true_target')))
+                #print(min_dist_cp, min_dist_ft)
                 self.recorder.save()
         
         # get obs
         ob = self._get_obs()
         
-        return ob, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl, done_status=done_status, coord=self.get_body_com('fingertip'), dist=dist)
+        return ob, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl, done_status=done_status, coord=self.get_body_com('fingertip'), dist=dist, min_dist_cp=min_dist_cp, min_dist_ft=min_dist_ft)
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
