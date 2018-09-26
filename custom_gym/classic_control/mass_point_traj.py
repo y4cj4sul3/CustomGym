@@ -4,7 +4,7 @@ from gym.utils import seeding
 import numpy as np
 from getch import getch, pause
 
-class MassPointEnv(gym.Env):
+class MassPointTrajEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -83,6 +83,8 @@ class MassPointEnv(gym.Env):
         #reward += -dist
 
         # check if hit the target point
+        if abs(xpos - self.task[-4]) <= self.speed_scale/2 and abs(ypos - self.task[-3]) <= self.speed_scale/2:
+            self.mid_done = True
         hit = 0
         if abs(xpos - self.task[-2]) <= self.speed_scale/2 and abs(ypos - self.task[-1]) <= self.speed_scale/2 and self.mid_done:
             hit = 1
@@ -125,7 +127,7 @@ class MassPointEnv(gym.Env):
         if task is None:
             #self.task = np.random.random_sample(np.shape(self.low_task))
             #self.task = self.task*(self.high_task-self.low_task)+self.low_task
-            self.task = np.random.uniform(-1, 1, (2,))
+            self.task = np.random.uniform(-1, 1, (4,))
             #print('self_task:' + str(self.task))
         else:
             self.task = np.array(task)

@@ -15,7 +15,7 @@ class FiveTargetColorEnv(gym.Env):
         # Parameters
         self.min_pos = -1
         self.max_pos = 1
-        self.speed_scale = 0.05
+        self.speed_scale = 0.1
         self.rotate_scale = 0.3
         self.num_targets = 5
         self.color_code_dim = 3
@@ -53,11 +53,11 @@ class FiveTargetColorEnv(gym.Env):
 
         # Target
         self.targets = []
-        self.target_coord = [18, 90, 162, 234, 306]
+        self.target_coord = [18, 54, 90, 126, 162]
         self.target_coord = [np.deg2rad(x) for x in self.target_coord]
         self.target_coord = [(np.cos(x), np.sin(x)) for x in self.target_coord]
         
-        self.target_size = 0.2
+        self.target_size = 0.05
 
         # Color Code
         self.colors = np.array([
@@ -120,10 +120,10 @@ class FiveTargetColorEnv(gym.Env):
             if dist < self.target_size:
                 done = True
                 if i == self.task:
-                    if self.Debug: print('Right Target')
+                    print('Right Target')
                     reward += 5
                 else:
-                    if self.Debug: print('Wrong Target')
+                    print('Wrong Target')
                     reward += 1
                 break
         
@@ -132,15 +132,17 @@ class FiveTargetColorEnv(gym.Env):
             if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
                 done = True
                 reward += -5
-                if self.Debug: print('Hit the Wall')
+                print('Hit the Wall')
         
         # times up
-        self.timesteps += 5
+        self.timesteps += 1
         if not done and self.timesteps >= self.max_timesteps:
             done = True
             reward += -3
-            if self.Debug: print('Times Up')
+            print('Times Up')
         if done: print(reward)
+        
+
 
         return self.get_obs(), reward, done, {}
 
@@ -153,7 +155,7 @@ class FiveTargetColorEnv(gym.Env):
             if np.all(code == (0, 1, 1)): return 4
 
         # Task
-        self.task = np.random.randint(5) if task is None else color_code2idx(task)
+        self.task = np.random.randint(5) if task is None else task
         self.task = np.array(self.task)
         
         # Instruction
@@ -168,7 +170,7 @@ class FiveTargetColorEnv(gym.Env):
 
         # State
         theta = 2 * np.pi * np.random.random_sample()
-        self.state = np.array([0, 0, np.cos(theta), np.sin(theta)])
+        self.state = np.array([0, -0.5, 0, 1])
 
         return self.get_obs()
         
