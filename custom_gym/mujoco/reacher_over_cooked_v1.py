@@ -3,7 +3,7 @@ from gym import utils
 from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
 
-class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
         self.set_target()
@@ -14,7 +14,7 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # recorder
         self.is_record = False
         if self.is_record:
-            self.recorder = Recoder('Dataset/ReacherOverCooked-v0/test/')
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         
@@ -116,7 +116,8 @@ class ReacherOverCookedEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # qpos (16 dim)
         # [(finger_2_angle), (true_target_xy), (t1_xy), (t2_xy), (t3_xy), (t4_xy), (checkpoint), (t5_xy)]
         #qpos = self.np_random.uniform(low=-0.1, high=0.1, size=self.model.nq) + self.init_qpos
-        qpos = np.array([0, 0, 0, .15, -.1, .1, -.2, 0, -.1, -.1, 0, -.15, .1, .1, .1, -.1])
+        cp_coord = np.sqrt(0.5)
+        qpos = .21*np.array([0, 0, -.1, 0, -.3, 0, -.5, 0, -.7, 0, -.9, 0, cp_coord, cp_coord, cp_coord, -cp_coord])
         qpos[12], qpos[self.target_id[0]*2+12] = qpos[self.target_id[0]*2+12], qpos[12]
         qpos[13], qpos[self.target_id[0]*2+13] = qpos[self.target_id[0]*2+13], qpos[13]
         # set target position
