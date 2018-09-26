@@ -56,7 +56,7 @@ class OverCookedEnv(gym.Env):
         self.target_coord = range(18, 180, 36)
         self.target_coord = [np.deg2rad(x) for x in self.target_coord]
         self.target_coord = [(np.cos(x), np.sin(x)) for x in self.target_coord]
-        self.target_coord = np.concatenate(([(0.5, 0)], [(-0.5, 0)], self.target_coord))
+        self.target_coord = np.concatenate(([(0.25, 0)], [(-0.25, 0)], self.target_coord))
         print(self.target_coord)
 
         self.target_size = 0.05
