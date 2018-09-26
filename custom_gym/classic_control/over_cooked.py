@@ -10,6 +10,10 @@ class OverCookedEnv(gym.Env):
     }
 
     def __init__(self, idx=0):
+        # Environment Settings
+        self.random_task = False
+        self.num_episode = 0
+
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
@@ -56,7 +60,7 @@ class OverCookedEnv(gym.Env):
         self.target_coord = range(18, 180, 36)
         self.target_coord = [np.deg2rad(x) for x in self.target_coord]
         self.target_coord = [(np.cos(x), np.sin(x)) for x in self.target_coord]
-        self.target_coord = np.concatenate(([(0.5, 0)], [(-0.5, 0)], self.target_coord))
+        self.target_coord = np.concatenate(([(0.25, 0)], [(-0.25, 0)], self.target_coord))
         print(self.target_coord)
 
         self.target_size = 0.05
@@ -67,6 +71,9 @@ class OverCookedEnv(gym.Env):
         # Timestep
         self.max_timesteps = 200
         self.timesteps = 0
+
+        # Penalty
+        self.task_penalty = 0
 
         self.seed()
         self.reset()
@@ -107,7 +114,16 @@ class OverCookedEnv(gym.Env):
         # time penalty(distance)
         vec = np.array([xpos-self.target_coord[self.task[0]][0], ypos-self.target_coord[self.task[0]][1]])
         dist = np.linalg.norm(vec)
-        reward += -dist * 0.1
+        reward += -dist #* 0.1
+        #print('Distance Reward: {}'.format(reward))
+        # time penalty(task)
+        #reward += -1.245*(len(self.task)-1)
+        #reward += 1.245*(2-len(self.task))
+        reward += self.task_penalty
+        if self.task_penalty > 0:
+            #print('Task: {}'.format(self.task_penalty))
+            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale/2))
+
         
         done_status = ''
         # hit the target
@@ -124,21 +140,24 @@ class OverCookedEnv(gym.Env):
                     if len(self.task) == 1:
                         # finish all tasks
                         done = True
-                        reward += 1
+                        #reward += 10
                         print('Finish Task')
                         done_status = 'Finish Task'
                     else:
                         # finish subtask
-                        reward += 0
+                        #reward += 20
                         print('Right Target')
                         done_status = 'Right Target'
+                        # start task penalty
+                        self.task_penalty = np.linalg.norm(self.target_coord[self.task[0]]-self.target_coord[self.task[1]])
                         # pop task
                         self.finished_task.append(self.task[0])
                         self.task = self.task[1:]
+
                 else:
                     # hit wrong target
                     done = True
-                    reward += -0.2
+                    #reward += -10
                     print('Wrong Target')
                     done_status = 'Wrong Target'
                 break
@@ -148,7 +167,7 @@ class OverCookedEnv(gym.Env):
             if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
             #if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
                 done = True
-                reward += -1
+                #reward += -50
                 print('Hit the Wall')
                 done_status = 'Hit the Wall'
         
@@ -156,9 +175,12 @@ class OverCookedEnv(gym.Env):
         self.timesteps += 1
         if not done and self.timesteps >= self.max_timesteps:
             done = True
-            reward += -0.5
+            #reward += -50
             print('Times Up')
             done_status = 'Times Up'
+
+        if done:
+            self.num_episode = (self.num_episode+1)%10
 
         return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
 
@@ -167,10 +189,14 @@ class OverCookedEnv(gym.Env):
         # Task
         # sequence of target to visit
         if task is None:
-            # general setting
-            #task = np.random.randint(self.num_targets, size(num_task)) 
-            # [middle target, final target]
-            task = [np.random.randint(2), 2+np.random.randint(5)]
+            if self.random_task:
+                # general setting
+                #task = np.random.randint(self.num_targets, size(num_task)) 
+                # [middle target, final target]
+                task = [np.random.randint(2), 2+np.random.randint(5)]
+            else:
+                task = [(self.num_episode%10)//5, 2+(self.num_episode%5)]
+                
         self.task = np.array(task)
         self.finished_task = []
         

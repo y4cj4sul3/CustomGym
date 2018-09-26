@@ -4,13 +4,19 @@ from gym import spaces
 #from gym.envs.mujoco import mujoco_env
 from custom_gym.mujoco import mujoco_env
 
-class ReacherGEPEnv(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherGEPTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         self.timestep = 0
         self.maxtimestep = 15
-        self.task_goal = np.array([1, 1])
+        
+        f_goal = []
+        for x in range(5):
+            f_goal.append([np.cos(np.deg2rad(180)) * x * 0.2 - 0.1, np.sin(np.deg2rad(180)) * x * 0.2])
+        self.targetList = f_goal
+        #self.targetList = np.array([[0, .15], [-.1, .1], [-.2, 0], [-.1, -.1], [0, -.15]])
+        self.task = np.array([-1, -1])
         self.zoneCheck = 0.019
-        self.N_success = 0
+
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher.xml', 2)
 
@@ -21,30 +27,25 @@ class ReacherGEPEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.do_simulation(a, self.frame_skip)
 
         # State
-        vec = self.get_body_com("fingertip")[:2]-self.get_body_com("target")[:2]
+        vec = self.get_body_com("fingertip")[0:2]-self.get_body_com("target")[0:2]
         dist = np.linalg.norm(vec)
         reward_dist = - dist
         reward_ctrl = - np.square(a).sum()
         reward = reward_dist + reward_ctrl
         
-        # State after Sim
+        # Check if close enough to the target
         done = False
-        if dist <= self.zoneCheck:
+        if dist < self.zoneCheck:
             done = True
             reward += 1
             print("Success")
-            if self.isEval:
-                self.N_success += 1
-                print('N_success', self.N_success)
-        #print('xpos ypos:' + str(xpos) + ' ' + str(ypos))
-        #print('goal:' + str(self.task_goal[0]) + ' ' + str(self.task_goal[1]))
 
         self.timestep += 1
         if not done and self.timestep >= self.maxtimestep:
             done = True
             reward += -0.5
             print('Times Up')
-        
+
         obs = self._get_obs()
 
         return obs, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl, t=self.timestep)
@@ -52,23 +53,17 @@ class ReacherGEPEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
 
-    def reset_model(self, task=None, maxtimestep=30, isEval=False):
+    def reset_model(self, task=None):
         # Position
         # [arm_angle_1, arm_angle_2, target_xpos, target_ypos]
         qpos = self.init_qpos
-        while True:
-            if task is None:
-                theta = np.random.sample() * 360
-                rad = np.random.sample() * 0.21
-                self.goal = np.array([np.cos(np.deg2rad(theta)) * rad, np.sin(np.deg2rad(theta)) * rad])
-                #self.goal = np.array([1, 1])
-            else:
-                self.goal = np.array([task[0]*0.21, task[1]*0.21])
-            if np.linalg.norm(self.goal) <= 0.21:
-                break
-        # copy goal -> task
-        self.task_goal = self.goal
-        qpos[-2:] = self.goal
+        if task is not None:
+            self.task = task
+            qpos[2], qpos[3] = self.targetList[self.task[1]][0], self.targetList[self.task[1]][1]
+            #print('ins:', task)
+            #print('target pos:', self.targetList[task[1]])
+        #else:
+            #print('Evelyn ErrorrrrRRR')
 
         # Velocity
         # [arm_aglvel_1, arm_aglvec_2, target_xvel, target_yvel]
@@ -79,8 +74,6 @@ class ReacherGEPEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
         self.timestep = 0
-        self.maxtimestep = maxtimestep
-        self.isEval = isEval
         
         return self._get_obs()
 

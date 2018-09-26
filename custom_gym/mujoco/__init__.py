@@ -10,9 +10,13 @@ from custom_gym.mujoco.mujoco_env import MujocoEnv
 #from gym.envs.mujoco.inverted_double_pendulum import InvertedDoublePendulumEnv
 from custom_gym.mujoco.reacher import ReacherEnv
 from custom_gym.mujoco.reacher_gep import ReacherGEPEnv
+from custom_gym.mujoco.reacher_gep_test import ReacherGEPTestEnv
+from custom_gym.mujoco.reacher_gep_traj import ReacherGEPTrajEnv
+from custom_gym.mujoco.reacher_gep_traj_test import ReacherGEPTrajTestEnv
 from custom_gym.mujoco.reacher_five_target import ReacherFiveTargetEnv
 from custom_gym.mujoco.reacher_five_target_v1 import ReacherFiveTargetEnv_v1
 from custom_gym.mujoco.reacher_over_cooked import ReacherOverCookedEnv
+from custom_gym.mujoco.reacher_over_cooked_v1 import ReacherOverCookedEnv_v1
 #from gym.envs.mujoco.swimmer import SwimmerEnv
 #from gym.envs.mujoco.humanoidstandup import HumanoidStandupEnv
 #from gym.envs.mujoco.pusher import PusherEnv
