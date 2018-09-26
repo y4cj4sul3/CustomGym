@@ -28,12 +28,6 @@ class MujocoEnv(gym.Env):
         self.sim = mujoco_py.MjSim(self.model)
         self.data = self.sim.data
         self.viewer = None
-        # (Paulolbear) always not reach to avoid first step be done
-        self.task_goal = np.array([1, 1])
-        self.task_traj = np.array([1, 1, 1, 1])
-        self.timestep = 0
-        self.maxtimestep = 50
-        self.mid_done = False
 
         self.metadata = {
             'render.modes': ['human', 'rgb_array'],

@@ -34,7 +34,7 @@ register(
 )
 
 register(
-    id='FiveTarget-v1',
+    id='FiveTargetEnv-v1',
     entry_point='custom_gym.classic_control:FiveTargetEnv_v1',
     max_episode_steps=200,
 )
@@ -87,8 +87,21 @@ register(
 )
 
 register(
+    id='ReacherGEPTest-v0',
+    entry_point='custom_gym.mujoco:ReacherGEPTestEnv',
+    max_episode_steps=50,
+    reward_threshold=-3.75,
+)
+
+register(
     id='ReacherGEPTraj-v0',
     entry_point='custom_gym.mujoco:ReacherGEPTrajEnv',
+    max_episode_steps=50,
+)
+
+register(
+    id='ReacherGEPTrajTest-v0',
+    entry_point='custom_gym.mujoco:ReacherGEPTrajTestEnv',
     max_episode_steps=50,
 )
 
