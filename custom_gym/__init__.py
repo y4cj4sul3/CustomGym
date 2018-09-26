@@ -35,6 +35,12 @@ register(
 )
 
 register(
+    id='FiveTarget-v2',
+    entry_point='custom_gym.classic_control:FiveTargetEnv_v2',
+    max_episode_steps=200,
+)
+
+register(
     id='FiveTargetColor-v0',
     entry_point='custom_gym.classic_control:FiveTargetColorEnv',
     max_episode_steps=200,
