@@ -2,6 +2,7 @@ import numpy as np
 from gym import utils
 from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
+import os
 
 class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
@@ -10,10 +11,10 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         # timestep
         self.max_timesteps = 50
         self.timesteps = 0
-        
         # recorder
         self.is_record = True
         if self.is_record:
+            os.makedirs('Dataset/ReacherOverCooked-v1/test/', exist_ok=True)
             self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
@@ -22,7 +23,6 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         mujoco_env.MujocoEnv.__init__(self, 'reacher_over_cooked.xml', 2)
 
     def step(self, a):
-        
         # sim
         self.do_simulation(a, self.frame_skip)
 
