@@ -8,7 +8,7 @@ class ReacherOverCookedEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
         # random init target
         self.set_target()
         # timestep
-        self.max_timesteps = 25
+        self.max_timesteps = 20
         self.timesteps = 0
         
         # recorder
