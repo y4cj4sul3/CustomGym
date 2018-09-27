@@ -2,6 +2,7 @@ import numpy as np
 from gym import utils
 from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
+import os
 
 class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
@@ -55,7 +56,6 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
             reward += -0.5
             print('Times Up')
             done_status = 'Times Up'
-        
         # record
         if self.is_record:
             self.recorder.step(self._get_obs(), a)
@@ -106,16 +106,17 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         qvel = np.zeros(12)
 
         self.set_state(qpos, qvel)
-        '''
-        # save traj
-        #self.recorder.save()
-        # reset traj
-        self.recorder.reset_traj()
-        self.recorder.traj['reward'] = 0
-        self.recorder.traj['coord'] = []
-        # save first step
-        self.recorder.step(self._get_obs())
-        '''
+        
+        if self.is_record:
+            # save traj
+            ### self.recorder.save()
+            # reset traj
+            self.recorder.reset_traj()
+            self.recorder.traj['reward'] = 0
+            self.recorder.traj['coord'] = []
+            # save first step
+            self.recorder.step(self._get_obs())
+        
         return self._get_obs()
 
     def _get_obs(self):

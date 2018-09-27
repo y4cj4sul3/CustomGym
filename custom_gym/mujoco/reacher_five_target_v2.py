@@ -14,8 +14,8 @@ class ReacherFiveTargetEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         # recorder
         self.is_record = True
         if self.is_record:
-            os.makedirs('Dataset/ReacherFiveTarget-v1/test/', exist_ok=True)
-            self.recorder = Recoder('Dataset/ReacherFiveTarget-v1/test/')
+            os.makedirs('Dataset/ReacherFiveTarget-v2/test/', exist_ok=True)
+            self.recorder = Recoder('Dataset/ReacherFiveTarget-v2/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
     
