@@ -9,7 +9,7 @@ class ReacherFiveTargetEnv_v4(mujoco_env.MujocoEnv, utils.EzPickle):
         # random init target
         self.set_target()
         # timestep
-        self.max_timesteps = 50
+        self.max_timesteps = 20
         self.timesteps = 0
         # recorder
         self.is_record = True
