@@ -18,11 +18,13 @@ custom_gym/mujoco/*
 !custom_gym/mujoco/reacher_five_target_v2.py
 !custom_gym/mujoco/reacher_five_target_v3.py
 !custom_gym/mujoco/reacher_five_target_v4.py
+!custom_gym/mujoco/reacher_five_target_v5.py
 !custom_gym/mujoco/reacher_over_cooked.py
 !custom_gym/mujoco/reacher_over_cooked_v1.py
 !custom_gym/mujoco/reacher_over_cooked_v2.py
 !custom_gym/mujoco/reacher_over_cooked_v3.py
 !custom_gym/mujoco/reacher_over_cooked_v4.py
+!custom_gym/mujoco/reacher_over_cooked_v5.py
 !custom_gym/mujoco/assets
 custom_gym/mujoco/assets/*
 !custom_gym/mujoco/assets/reacher.xml
