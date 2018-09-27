@@ -11,3 +11,4 @@ from custom_gym.classic_control.five_target_color_random_face import FiveTargetC
 from custom_gym.classic_control.five_target_random_color import FiveTargetRandColorEnv
 from custom_gym.classic_control.five_target_random_color_v2 import FiveTargetRandColorEnv_v2
 from custom_gym.classic_control.over_cooked import OverCookedEnv
+from custom_gym.classic_control.over_cooked_v1 import OverCookedEnv_v1
