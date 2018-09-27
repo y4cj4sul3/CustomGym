@@ -5,7 +5,7 @@ import custom_gym
 # Create Environment
 #env = gym.make('MountainCarEx-v0')
 #env = gym.make('Kobuki-v0')
-env = gym.make('OverCooked-v0')
+env = gym.make('ReacherFiveTarget-v1')
 
 # Print action & observation space
 print(env.action_space)
@@ -29,8 +29,9 @@ for i_episode in range(3):
     
     # Interact with Environment
     #action = env.action_space.sample()
-    action = [0, 0]
+    action = [0.1, 0.1]
     obs, reward, done, info = env.step(action)
+    print(obs)
     #print("Reward: {}".format(reward))
     #print(obs)
     #print(info)

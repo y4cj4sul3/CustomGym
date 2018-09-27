@@ -2,6 +2,7 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import numpy as np
+from custom_gym.utils import Recoder
 
 class OverCookedEnv(gym.Env):
     metadata = {
@@ -14,6 +15,12 @@ class OverCookedEnv(gym.Env):
         self.random_task = False
         self.num_episode = 0
 
+        self.is_record = True
+        if self.is_record:
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
+            self.recorder.traj['reward'] = 0
+            self.recorder.traj['coord'] = []
+        
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
@@ -179,10 +186,28 @@ class OverCookedEnv(gym.Env):
             print('Times Up')
             done_status = 'Times Up'
 
+        # record
+        min_dist_cp = 0
+        min_dist_ft = 0
+        if self.is_record:
+            self.recorder.step(self.get_obs(), action)
+            #if hasattr(self.recorder.traj, 'reward'):
+            self.recorder.traj['reward'] += reward
+            self.recorder.traj['coord'].append(self.get_obs()[:2])
+            #if done_status == 'Finish Task':
+            if done:
+                # find dist closest to checkpoint
+                ctcp = np.argmin(np.linalg.norm(np.array(self.recorder.traj['coord'])-self.target_coord[self.fixed_task[0]], axis=1))
+                ctft = ctcp+np.argmin(np.linalg.norm(np.array(self.recorder.traj['coord'])[ctcp:]-self.target_coord[self.fixed_task[1]], axis=1))
+                min_dist_cp = np.linalg.norm(np.array(self.recorder.traj['coord'][ctcp]-self.target_coord[self.fixed_task[0]]))
+                min_dist_ft = np.linalg.norm(np.array(self.recorder.traj['coord'][ctft]-self.target_coord[self.fixed_task[1]]))
+                #print(min_dist_cp, min_dist_ft)
+                #self.recorder.save()
+
         if done:
             self.num_episode = (self.num_episode+1)%10
 
-        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
+        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist, 'min_dist_cp': min_dist_cp, 'min_dist_ft': min_dist_ft}
 
     def reset(self, task=None, num_task=2):
         
@@ -193,12 +218,13 @@ class OverCookedEnv(gym.Env):
                 # general setting
                 #task = np.random.randint(self.num_targets, size(num_task)) 
                 # [middle target, final target]
-                task = [np.random.randint(2), 2+np.random.randint(5)]
+                task = [np.random.randint(2), np.random.randint(5)]
             else:
                 task = [(self.num_episode%10)//5, 2+(self.num_episode%5)]
                 
         self.task = np.array(task)
         self.finished_task = []
+        self.fixed_task = np.copy(self.task)
         
         # Instruction (not general setting)
         self.instr = np.zeros(self.num_targets)

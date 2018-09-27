@@ -4,7 +4,7 @@ from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
 import os
 
-class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherFiveTargetEnv_v4(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
         self.set_target()
@@ -14,15 +14,16 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         # recorder
         self.is_record = True
         if self.is_record:
-            os.makedirs('Dataset/ReacherFiveTarget-v1/test/', exist_ok=True)
-            self.recorder = Recoder('Dataset/ReacherFiveTarget-v1/test/')
+            os.makedirs('Dataset/ReacherFiveTarget-v4/test/', exist_ok=True)
+            self.recorder = Recoder('Dataset/ReacherFiveTarget-v4/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
-        
+    
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher_five_target_v1.xml', 2)
 
     def step(self, a):
+        
         # sim
         self.do_simulation(a, self.frame_skip)
 
@@ -81,9 +82,15 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
             self.target_id = target_id
         print('Current Target: {}'.format(self.target_id))
 
-        # instruction (one-hot)
-        self.target_one_hot = np.zeros(5)
-        self.target_one_hot[self.target_id] = 1
+        # instruction (color code)
+        instr_table = np.array([
+            [0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 0],
+            [1, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1],
+            [0, 0, 1, 0, 0],
+        ])
+        self.instr = instr_table[self.target_id]
 
     def reset_model(self, target_id=None):
         # random init target
@@ -120,16 +127,18 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         return self._get_obs()
 
     def _get_obs(self):
-        #print(self.sim.data.qpos)
-        theta = self.sim.data.qpos.flat[:2]
+        # print(self.sim.data.qpos)
+        # theta = self.sim.data.qpos.flat[:2]
         # Observation (11 dim)
         # [cos(angle_1), cos(angle_2),
         #  sin(angle_2), sin(angle_2),
         #  angle_vec_1, angle_vec_2,
         #  one_hot_instruction]
+        xpos = self.get_body_com("fingertip")[0]/.21
+        ypos = self.get_body_com("fingertip")[1]/.21
+
         return np.concatenate([
-            np.cos(theta),
-            np.sin(theta),
+            [xpos, ypos],
             self.sim.data.qvel.flat[:2],
-            self.target_one_hot
+            self.instr
         ])

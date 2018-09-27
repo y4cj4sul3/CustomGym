@@ -2,6 +2,7 @@ import numpy as np
 from gym import utils
 from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
+import os
 
 class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
@@ -10,10 +11,10 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         # timestep
         self.max_timesteps = 20
         self.timesteps = 0
-        
         # recorder
-        self.is_record = False
+        self.is_record = True
         if self.is_record:
+            os.makedirs('Dataset/ReacherOverCooked-v1/test/', exist_ok=True)
             self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
@@ -22,7 +23,6 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         mujoco_env.MujocoEnv.__init__(self, 'reacher_over_cooked.xml', 2)
 
     def step(self, a):
-        
         # sim
         self.do_simulation(a, self.frame_skip)
 
@@ -91,7 +91,7 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
                 min_dist_cp = np.linalg.norm(np.array(self.recorder.traj['coord'][ctcp]-self.get_body_com('checkpoint')))
                 min_dist_ft = np.linalg.norm(np.array(self.recorder.traj['coord'][ctft]-self.get_body_com('true_target')))
                 #print(min_dist_cp, min_dist_ft)
-                self.recorder.save()
+                #self.recorder.save()
         
         # get obs
         ob = self._get_obs()
