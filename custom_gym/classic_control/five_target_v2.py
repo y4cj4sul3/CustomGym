@@ -19,8 +19,8 @@ class FiveTargetEnv_v2(gym.Env):
         
         # Define Instruction Space
         # one-hot
-        self.high_instr = np.ones(3)
-        self.low_instr = np.zeros(3)
+        self.high_instr = np.ones(self.num_targets)
+        self.low_instr = np.zeros(self.num_targets)
         
         self.instr_space = spaces.Box(self.low_instr, self.high_instr, dtype=np.float32)
 
@@ -152,11 +152,11 @@ class FiveTargetEnv_v2(gym.Env):
         
         # Instruction
         instr_table = np.array([
-            [0, 1, 0],
-            [1, 0, 1],
-            [0, 0, 1],
-            [1, 1, 0],
-            [1, 0, 0],
+            [0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 0],
+            [1, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1],
+            [0, 0, 1, 0, 0],
         ])
         self.instr = instr_table[self.task]
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
