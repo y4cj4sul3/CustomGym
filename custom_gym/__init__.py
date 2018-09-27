@@ -131,5 +131,5 @@ register(
 register(
     id='ReacherOverCooked-v3',
     entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v3',
-    max_episode_steps = 15,
+    max_episode_steps = 50,
 )

@@ -3,18 +3,18 @@ from gym import utils
 from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
 
-class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherOverCookedEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
         self.set_target()
         # timestep
-        self.max_timesteps = 15
+        self.max_timesteps = 25
         self.timesteps = 0
         
         # recorder
         self.is_record = False
         if self.is_record:
-            self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v3/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         
