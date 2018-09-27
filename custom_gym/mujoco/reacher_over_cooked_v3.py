@@ -12,9 +12,9 @@ class ReacherOverCookedEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
         self.timesteps = 0
         
         # recorder
-        self.is_record = False
+        self.is_record = True
         if self.is_record:
-            self.recorder = Recoder('Dataset/ReacherOverCooked-v3/test/')
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v3/demo_2500/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         
@@ -91,7 +91,7 @@ class ReacherOverCookedEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
                 min_dist_cp = np.linalg.norm(np.array(self.recorder.traj['coord'][ctcp]-self.get_body_com('checkpoint')))
                 min_dist_ft = np.linalg.norm(np.array(self.recorder.traj['coord'][ctft]-self.get_body_com('true_target')))
                 #print(min_dist_cp, min_dist_ft)
-                self.recorder.save()
+                #self.recorder.save()
         
         # get obs
         ob = self._get_obs()
