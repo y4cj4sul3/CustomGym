@@ -15,11 +15,13 @@ from custom_gym.mujoco.reacher_five_target_v1 import ReacherFiveTargetEnv_v1
 from custom_gym.mujoco.reacher_five_target_v2 import ReacherFiveTargetEnv_v2
 from custom_gym.mujoco.reacher_five_target_v3 import ReacherFiveTargetEnv_v3
 from custom_gym.mujoco.reacher_five_target_v4 import ReacherFiveTargetEnv_v4
+from custom_gym.mujoco.reacher_five_target_v5 import ReacherFiveTargetEnv_v5
 from custom_gym.mujoco.reacher_over_cooked import ReacherOverCookedEnv
 from custom_gym.mujoco.reacher_over_cooked_v1 import ReacherOverCookedEnv_v1
 from custom_gym.mujoco.reacher_over_cooked_v2 import ReacherOverCookedEnv_v2
 from custom_gym.mujoco.reacher_over_cooked_v3 import ReacherOverCookedEnv_v3
 from custom_gym.mujoco.reacher_over_cooked_v4 import ReacherOverCookedEnv_v4
+from custom_gym.mujoco.reacher_over_cooked_v5 import ReacherOverCookedEnv_v5
 #from gym.envs.mujoco.swimmer import SwimmerEnv
 #from gym.envs.mujoco.humanoidstandup import HumanoidStandupEnv
 #from gym.envs.mujoco.pusher import PusherEnv

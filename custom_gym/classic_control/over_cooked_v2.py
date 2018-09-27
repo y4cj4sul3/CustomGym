@@ -4,7 +4,7 @@ from gym.utils import seeding
 import numpy as np
 from custom_gym.utils import Recoder
 
-class OverCookedEnv(gym.Env):
+class OverCookedEnv_v2(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -17,7 +17,7 @@ class OverCookedEnv(gym.Env):
 
         self.is_record = True
         if self.is_record:
-            self.recorder = Recoder('Dataset/OverCooked-v0/test/')
+            self.recorder = Recoder('Dataset/OverCooked-v2/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         
@@ -93,6 +93,7 @@ class OverCookedEnv(gym.Env):
     def step(self, action):
         # Check action
         action = np.clip(action, self.low_action, self.high_action)
+        action = action * 0.5
         assert self.action_space.contains(action), "%r (%s) invalid action" % (action, type(action))
         
         # States before simulate

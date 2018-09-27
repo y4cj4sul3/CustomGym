@@ -4,7 +4,7 @@ from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
 import os
 
-class ReacherFiveTargetEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherFiveTargetEnv_v5(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
         self.set_target()
@@ -12,10 +12,10 @@ class ReacherFiveTargetEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
         self.max_timesteps = 20
         self.timesteps = 0
         # recorder
-        self.is_record = False
+        self.is_record = True
         if self.is_record:
-            os.makedirs('Dataset/ReacherFiveTarget-v3/demo_2500/', exist_ok=True)
-            self.recorder = Recoder('Dataset/ReacherFiveTarget-v3/demo_2500/')
+            os.makedirs('Dataset/ReacherFiveTarget-v3/test/', exist_ok=True)
+            self.recorder = Recoder('Dataset/ReacherFiveTarget-v3/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         utils.EzPickle.__init__(self)
@@ -23,6 +23,7 @@ class ReacherFiveTargetEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def step(self, a):
         # sim
+        a = np.array(a) * 0.9
         self.do_simulation(a, self.frame_skip)
 
         # after sim
@@ -61,6 +62,9 @@ class ReacherFiveTargetEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
             #if hasattr(self.recorder.traj, 'reward'):
             self.recorder.traj['reward'] += reward
             self.recorder.traj['coord'].append(self.get_body_com("fingertip").tolist())
+            #if done_status == 'Right Target':
+            #if done:
+            #    self.recorder.save()
         # get obs
         ob = self._get_obs()
         

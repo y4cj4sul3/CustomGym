@@ -2,34 +2,23 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 import numpy as np
-from custom_gym.utils import Recoder
 
-class OverCookedEnv(gym.Env):
+class FiveTargetEnv_v3(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
     }
 
     def __init__(self, idx=0):
-        # Environment Settings
-        self.random_task = False
-        self.num_episode = 0
-
-        self.is_record = True
-        if self.is_record:
-            self.recorder = Recoder('Dataset/OverCooked-v0/test/')
-            self.recorder.traj['reward'] = 0
-            self.recorder.traj['coord'] = []
-        
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
         self.speed_scale = 0.05
         self.rotate_scale = 0.3
-        self.num_targets = 7
+        self.num_targets = 5
         
         # Define Instruction Space
-        # one-hot (not general settings)
+        # one-hot
         self.high_instr = np.ones(self.num_targets)
         self.low_instr = np.zeros(self.num_targets)
         
@@ -60,14 +49,10 @@ class OverCookedEnv(gym.Env):
         self.viewer = None
 
         # Target
-        # target geom (for rendering)
         self.targets = []
-        # target coordinate
-        # [mid * 2, final * 5]
         self.target_coord = range(18, 180, 36)
         self.target_coord = [np.deg2rad(x) for x in self.target_coord]
         self.target_coord = [(np.cos(x), np.sin(x)) for x in self.target_coord]
-        self.target_coord = np.concatenate(([(0.25, 0)], [(-0.25, 0)], self.target_coord))
         print(self.target_coord)
 
         self.target_size = 0.05
@@ -78,9 +63,6 @@ class OverCookedEnv(gym.Env):
         # Timestep
         self.max_timesteps = 200
         self.timesteps = 0
-
-        # Penalty
-        self.task_penalty = 0
 
         self.seed()
         self.reset()
@@ -93,6 +75,7 @@ class OverCookedEnv(gym.Env):
     def step(self, action):
         # Check action
         action = np.clip(action, self.low_action, self.high_action)
+        action = action * 0.5
         assert self.action_space.contains(action), "%r (%s) invalid action" % (action, type(action))
         
         # States before simulate
@@ -119,54 +102,25 @@ class OverCookedEnv(gym.Env):
         reward = 0
         xpos, ypos, xface, yface = self.state
         # time penalty(distance)
-        vec = np.array([xpos-self.target_coord[self.task[0]][0], ypos-self.target_coord[self.task[0]][1]])
+        vec = np.array([xpos-self.target_coord[self.task][0], ypos-self.target_coord[self.task][1]])
         dist = np.linalg.norm(vec)
-        reward += -dist #* 0.1
-        #print('Distance Reward: {}'.format(reward))
-        # time penalty(task)
-        #reward += -1.245*(len(self.task)-1)
-        #reward += 1.245*(2-len(self.task))
-        reward += self.task_penalty
-        if self.task_penalty > 0:
-            #print('Task: {}'.format(self.task_penalty))
-            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale/2))
-
+        reward += -dist * 0.1
         
         done_status = ''
         # hit the target
         for i in range(self.num_targets):
-            # skip finished target
-            if self.finished_task.count(i) > 0:
-                continue
             vec = np.array([xpos-self.target_coord[i][0], ypos-self.target_coord[i][1]])
             dist = np.linalg.norm(vec)
             if dist < self.target_size:
-                #done = True
-                if i == self.task[0]:
-                    # hit right target
-                    if len(self.task) == 1:
-                        # finish all tasks
-                        done = True
-                        #reward += 10
-                        print('Finish Task')
-                        done_status = 'Finish Task'
-                    else:
-                        # finish subtask
-                        #reward += 20
-                        print('Right Target')
-                        done_status = 'Right Target'
-                        # start task penalty
-                        self.task_penalty = np.linalg.norm(self.target_coord[self.task[0]]-self.target_coord[self.task[1]])
-                        # pop task
-                        self.finished_task.append(self.task[0])
-                        self.task = self.task[1:]
-
+                done = True
+                if i == self.task:
+                    print('Right Target')
+                    done_status = 'Right Target'
+                    reward += 1
                 else:
-                    # hit wrong target
-                    done = True
-                    #reward += -10
                     print('Wrong Target')
                     done_status = 'Wrong Target'
+                    reward += -0.2
                 break
         
         # hit the wall
@@ -174,7 +128,7 @@ class OverCookedEnv(gym.Env):
             if xpos == 1 or xpos == -1 or ypos == 1 or ypos == -1:
             #if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
                 done = True
-                #reward += -50
+                reward += -1
                 print('Hit the Wall')
                 done_status = 'Hit the Wall'
         
@@ -182,54 +136,31 @@ class OverCookedEnv(gym.Env):
         self.timesteps += 1
         if not done and self.timesteps >= self.max_timesteps:
             done = True
-            #reward += -50
+            reward += -0.5
             print('Times Up')
             done_status = 'Times Up'
 
-        # record
-        min_dist_cp = 0
-        min_dist_ft = 0
-        if self.is_record:
-            self.recorder.step(self.get_obs(), action)
-            #if hasattr(self.recorder.traj, 'reward'):
-            self.recorder.traj['reward'] += reward
-            self.recorder.traj['coord'].append(self.get_obs()[:2])
-            #if done_status == 'Finish Task':
-            if done:
-                # find dist closest to checkpoint
-                ctcp = np.argmin(np.linalg.norm(np.array(self.recorder.traj['coord'])-self.target_coord[self.fixed_task[0]], axis=1))
-                ctft = ctcp+np.argmin(np.linalg.norm(np.array(self.recorder.traj['coord'])[ctcp:]-self.target_coord[self.fixed_task[1]], axis=1))
-                min_dist_cp = np.linalg.norm(np.array(self.recorder.traj['coord'][ctcp]-self.target_coord[self.fixed_task[0]]))
-                min_dist_ft = np.linalg.norm(np.array(self.recorder.traj['coord'][ctft]-self.target_coord[self.fixed_task[1]]))
-                #print(min_dist_cp, min_dist_ft)
-                #self.recorder.save()
+        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
 
-        if done:
-            self.num_episode = (self.num_episode+1)%10
-
-        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist, 'min_dist_cp': min_dist_cp, 'min_dist_ft': min_dist_ft}
-
-    def reset(self, task=None, num_task=2):
+    def reset(self, task=None):
         
         # Task
-        # sequence of target to visit
         if task is None:
-            if self.random_task:
-                # general setting
-                #task = np.random.randint(self.num_targets, size(num_task)) 
-                # [middle target, final target]
-                task = [np.random.randint(2), np.random.randint(5)]
-            else:
-                task = [(self.num_episode%10)//5, 2+(self.num_episode%5)]
-                
+            #task = np.random.random_sample(np.shape(self.low_task))
+            #task = task*(self.high_task-self.low_task)+self.low_task
+            task = np.random.randint(self.num_targets)
         self.task = np.array(task)
-        self.finished_task = []
-        self.fixed_task = np.copy(self.task)
         
-        # Instruction (not general setting)
+        # Instruction
         self.instr = np.zeros(self.num_targets)
         self.instr[self.task] = 1
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
+
+        # Set target
+        self.target_color = []
+        for i in range(5):
+            self.target_color.append([0, 1, 0])
+        self.target_color[self.task] = [1, 0, 0]
 
         # Timestep
         self.timesteps = 0
@@ -304,22 +235,11 @@ class OverCookedEnv(gym.Env):
         theta = np.arctan2(yface, xface)
         self.point_trans.set_translation(xpos*scale+screen_size/2, ypos*scale+screen_size/2)
         self.point_trans.set_rotation(theta)
-        
-        # Color
-        # general target
+        # target
+        #print(len(self.targets))
         for i in range(self.num_targets):
-            # green
-            self.targets[i].set_color(0, 1, 0)
-        # task target
-        if len(self.task) > 0:
-            # current task target (red)
-            self.targets[self.task[0]].set_color(1, 0, 0)
-            # later task target (blue)
-            for i in self.task[1:]:
-                self.targets[i].set_color(0, 0, 1)
-            # finished task target (yellow)
-            for i in self.finished_task:
-                self.targets[i].set_color(1, 1, 0)
+            r, g, b = self.target_color[i]
+            self.targets[i].set_color(r, g, b)
 
         return self.viewer.render(return_rgb_array = mode=='rgb_array')
 

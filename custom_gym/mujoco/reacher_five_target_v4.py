@@ -64,8 +64,8 @@ class ReacherFiveTargetEnv_v4(mujoco_env.MujocoEnv, utils.EzPickle):
             self.recorder.traj['reward'] += reward
             self.recorder.traj['coord'].append(self.get_body_com("fingertip").tolist())
             #if done_status == 'Right Target':
-            if done:
-                self.recorder.save()
+            #if done:
+            #    self.recorder.save()
         # get obs
         ob = self._get_obs()
         

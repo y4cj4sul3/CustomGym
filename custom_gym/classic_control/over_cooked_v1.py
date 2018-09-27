@@ -4,7 +4,7 @@ from gym.utils import seeding
 import numpy as np
 from custom_gym.utils import Recoder
 
-class OverCookedEnv(gym.Env):
+class OverCookedEnv_v1(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -17,7 +17,7 @@ class OverCookedEnv(gym.Env):
 
         self.is_record = True
         if self.is_record:
-            self.recorder = Recoder('Dataset/OverCooked-v0/test/')
+            self.recorder = Recoder('Dataset/OverCooked-v1/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         
@@ -225,10 +225,20 @@ class OverCookedEnv(gym.Env):
         self.task = np.array(task)
         self.finished_task = []
         self.fixed_task = np.copy(self.task)
+
+        
         
         # Instruction (not general setting)
         self.instr = np.zeros(self.num_targets)
         self.instr[self.task] = 1
+        shuffle_matrix = np.array([[0, 0, 0, 1, 0, 0, 0],
+                                   [0, 0, 0, 0, 0, 0, 1],
+                                   [0, 1, 0, 0, 0, 0, 0],
+                                   [0, 0, 0, 0, 1, 0, 0],
+                                   [0, 0, 1, 0, 0, 0, 0],
+                                   [1, 0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0, 0, 0, 1, 0]])
+        self.instr = shuffle_matrix.dot(self.instr)
         assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
 
         # Timestep

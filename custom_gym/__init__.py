@@ -46,6 +46,12 @@ register(
 )
 
 register(
+    id='FiveTarget-v3',
+    entry_point='custom_gym.classic_control:FiveTargetEnv_v3',
+    max_episode_steps=200,
+)
+
+register(
     id='FiveTargetColor-v0',
     entry_point='custom_gym.classic_control:FiveTargetColorEnv',
     max_episode_steps=200,
@@ -72,6 +78,18 @@ register(
 register(
     id = 'OverCooked-v0',
     entry_point='custom_gym.classic_control:OverCookedEnv',
+    max_episode_steps=200,
+)
+
+register(
+    id = 'OverCooked-v1',
+    entry_point='custom_gym.classic_control:OverCookedEnv_v1',
+    max_episode_steps=200,
+)
+
+register(
+    id = 'OverCooked-v2',
+    entry_point='custom_gym.classic_control:OverCookedEnv_v2',
     max_episode_steps=200,
 )
 
@@ -134,6 +152,13 @@ register(
 )
 
 register(
+    id='ReacherFiveTarget-v5',
+    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v5',
+    max_episode_steps = 50,
+    reward_threshold=-3.75,
+)
+
+register(
     id='ReacherOverCooked-v0',
     entry_point='custom_gym.mujoco:ReacherOverCookedEnv',
     max_episode_steps = 50,
@@ -163,5 +188,11 @@ register(
 register(
     id='ReacherOverCooked-v4',
     entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v4',
+    max_episode_steps = 50,
+)
+
+register(
+    id='ReacherOverCooked-v5',
+    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v5',
     max_episode_steps = 50,
 )
