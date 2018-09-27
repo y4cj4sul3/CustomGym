@@ -136,7 +136,20 @@ register(
 )
 
 register(
+    id='ReacherOverCooked-v2',
+    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v2',
+    max_episode_steps = 50,
+    reward_threshold=-3.75,
+)
+
+register(
     id='ReacherOverCooked-v3',
     entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v3',
+    max_episode_steps = 50,
+)
+
+register(
+    id='ReacherOverCooked-v4',
+    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v4',
     max_episode_steps = 50,
 )
