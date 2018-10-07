@@ -9,7 +9,7 @@ class ReacherGEPTrajEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.task_traj = np.array([1, 1, 1, 1])
         self.mid_done = False
         self.timestep = 0
-        self.maxtimestep = 15
+        self.maxtimestep = 20
         self.zoneCheck = 0.019
         self.N_success = 0
         utils.EzPickle.__init__(self)
@@ -19,6 +19,7 @@ class ReacherGEPTrajEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def step(self, a):
         # Simulate
+        #a *= 0.9
         self.do_simulation(a, self.frame_skip)
 
         # State
@@ -35,6 +36,9 @@ class ReacherGEPTrajEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         if m_dist < self.zoneCheck:
             self.mid_done = True
             #print("Mid Success")
+        
+        vec = self.get_body_com("fingertip")[0:2]-self.task_traj[2:4]
+        m_dist = np.linalg.norm(vec)
         if dist < self.zoneCheck and self.mid_done:
             done = True
             reward += 1
@@ -56,7 +60,7 @@ class ReacherGEPTrajEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
 
-    def reset_model(self, task=None, maxtimestep=15, isEval=False):
+    def reset_model(self, task=None, maxtimestep=20, isEval=False):
         # Position
         # [arm_angle_1, arm_angle_2, target_xpos, target_ypos]
         # replace goal -> task

@@ -7,13 +7,9 @@ from custom_gym.mujoco import mujoco_env
 class ReacherGEPTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         self.timestep = 0
-        self.maxtimestep = 15
+        self.maxtimestep = 20
         
-        f_goal = []
-        for x in range(5):
-            f_goal.append([np.cos(np.deg2rad(180)) * x * 0.2 - 0.1, np.sin(np.deg2rad(180)) * x * 0.2])
-        self.targetList = f_goal
-        #self.targetList = np.array([[0, .15], [-.1, .1], [-.2, 0], [-.1, -.1], [0, -.15]])
+        self.targetList = np.array([[0, .15], [-.1, .1], [-.2, 0], [-.1, -.1], [0, -.15]])
         self.task = np.array([-1, -1])
         self.zoneCheck = 0.019
 
@@ -53,18 +49,22 @@ class ReacherGEPTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
 
-    def reset_model(self, task=None):
+    def reset_model(self, task=None, maxtimestep=20, isEval=False):
         # Position
         # [arm_angle_1, arm_angle_2, target_xpos, target_ypos]
         qpos = self.init_qpos
         if task is not None:
             self.task = task
-            qpos[2], qpos[3] = self.targetList[self.task[1]][0], self.targetList[self.task[1]][1]
-            #print('ins:', task)
-            #print('target pos:', self.targetList[task[1]])
-        #else:
+            self.goal = self.targetList[self.task[1]][0], self.targetList[self.task[1]][1]
+            print('ins:', task)
+            print('target pos:', self.targetList[task[1]])
+        else:
+            theta = np.random.sample() * 360
+            rad = np.random.sample() * 0.21
+            self.goal = np.array([np.cos(np.deg2rad(theta)) * rad, np.sin(np.deg2rad(theta)) * rad])
             #print('Evelyn ErrorrrrRRR')
 
+        qpos[-2:] = self.goal
         # Velocity
         # [arm_aglvel_1, arm_aglvec_2, target_xvel, target_yvel]
         qvel = self.init_qvel
@@ -74,6 +74,8 @@ class ReacherGEPTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
         self.timestep = 0
+        self.maxtimestep = maxtimestep
+        self.isEval = isEval
         
         return self._get_obs()
 

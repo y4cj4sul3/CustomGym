@@ -11,6 +11,7 @@ from custom_gym.mujoco.mujoco_env import MujocoEnv
 from custom_gym.mujoco.reacher import ReacherEnv
 from custom_gym.mujoco.reacher_gep import ReacherGEPEnv
 from custom_gym.mujoco.reacher_gep_test import ReacherGEPTestEnv
+from custom_gym.mujoco.reacher_gep_test_try import ReacherGEPTestTryEnv
 from custom_gym.mujoco.reacher_gep_traj import ReacherGEPTrajEnv
 from custom_gym.mujoco.reacher_gep_traj_test import ReacherGEPTrajTestEnv
 from custom_gym.mujoco.reacher_five_target import ReacherFiveTargetEnv
