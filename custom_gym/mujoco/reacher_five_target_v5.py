@@ -12,7 +12,7 @@ class ReacherFiveTargetEnv_v5(mujoco_env.MujocoEnv, utils.EzPickle):
         self.max_timesteps = 20
         self.timesteps = 0
         # recorder
-        self.is_record = True
+        self.is_record = False
         if self.is_record:
             os.makedirs('Dataset/ReacherFiveTarget-v3/test/', exist_ok=True)
             self.recorder = Recoder('Dataset/ReacherFiveTarget-v3/test/')
@@ -40,7 +40,7 @@ class ReacherFiveTargetEnv_v5(mujoco_env.MujocoEnv, utils.EzPickle):
         if dist < 0.019:
             done = True
             reward += 1
-            print('Right Target')
+            #print('Right Target')
             done_status = 'Right Target'
         '''
         # TODO: wrong target
@@ -54,7 +54,7 @@ class ReacherFiveTargetEnv_v5(mujoco_env.MujocoEnv, utils.EzPickle):
         if not done and self.timesteps >= self.max_timesteps:
             done = True
             reward += -0.5
-            print('Times Up')
+            #print('Times Up')
             done_status = 'Times Up'
         # record
         if self.is_record:
@@ -79,7 +79,7 @@ class ReacherFiveTargetEnv_v5(mujoco_env.MujocoEnv, utils.EzPickle):
             self.target_id = np.random.randint(5)
         else:
             self.target_id = target_id
-        print('Current Target: {}'.format(self.target_id))
+        #print('Current Target: {}'.format(self.target_id))
 
         # instruction (one-hot)
         self.target_one_hot = np.zeros(5)
