@@ -41,13 +41,13 @@ register(
 )
 
 register(
-    id='MassPointTraj-v0',
+    id='MassPointGoalInstr-v0',
     entry_point='custom_gym.classic_control:FiveTargetEnv_v2',
     max_episode_steps=200,
 )
 
 register(
-    id='MassPointGoalInstr-v0',
+    id='MassPointGoalAction-v0',
     entry_point='custom_gym.classic_control:FiveTargetEnv_v3',
     max_episode_steps=200,
 )

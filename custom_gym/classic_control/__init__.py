@@ -1,5 +1,5 @@
-from custom_gym.classic_control.mountain_car import MountainCarEnv
-from custom_gym.classic_control.mass_point import MassPointEnv
+#from custom_gym.classic_control.mountain_car import MountainCarEnv
+#from custom_gym.classic_control.mass_point import MassPointEnv
 
 #from custom_gym.classic_control.mass_point_v1 import MassPointEnv_v1
 #from custom_gym.classic_control.mass_point_gep import MassPointGEPEnv
