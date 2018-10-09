@@ -12,7 +12,7 @@ class OverCookedEnv(gym.Env):
 
     def __init__(self, idx=0):
         # Environment Settings
-        self.random_task = False
+        self.random_task = True
         self.num_episode = 0
 
         self.is_record = True
@@ -129,7 +129,7 @@ class OverCookedEnv(gym.Env):
         reward += self.task_penalty
         if self.task_penalty > 0:
             #print('Task: {}'.format(self.task_penalty))
-            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale/2))
+            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale))
 
         
         done_status = ''
@@ -147,13 +147,13 @@ class OverCookedEnv(gym.Env):
                     if len(self.task) == 1:
                         # finish all tasks
                         done = True
-                        #reward += 10
-                        print('Finish Task')
+                        reward += 10
+                        #print('Finish Task')
                         done_status = 'Finish Task'
                     else:
                         # finish subtask
                         #reward += 20
-                        print('Right Target')
+                        #print('Right Target')
                         done_status = 'Right Target'
                         # start task penalty
                         self.task_penalty = np.linalg.norm(self.target_coord[self.task[0]]-self.target_coord[self.task[1]])
@@ -165,7 +165,7 @@ class OverCookedEnv(gym.Env):
                     # hit wrong target
                     done = True
                     #reward += -10
-                    print('Wrong Target')
+                    #print('Wrong Target')
                     done_status = 'Wrong Target'
                 break
         
@@ -175,7 +175,7 @@ class OverCookedEnv(gym.Env):
             #if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
                 done = True
                 #reward += -50
-                print('Hit the Wall')
+                #print('Hit the Wall')
                 done_status = 'Hit the Wall'
         
         # times up
@@ -183,7 +183,7 @@ class OverCookedEnv(gym.Env):
         if not done and self.timesteps >= self.max_timesteps:
             done = True
             #reward += -50
-            print('Times Up')
+            #print('Times Up')
             done_status = 'Times Up'
 
         # record
@@ -218,7 +218,7 @@ class OverCookedEnv(gym.Env):
                 # general setting
                 #task = np.random.randint(self.num_targets, size(num_task)) 
                 # [middle target, final target]
-                task = [np.random.randint(2), np.random.randint(5)]
+                task = [np.random.randint(2), 2+np.random.randint(5)]
             else:
                 task = [(self.num_episode%10)//5, 2+(self.num_episode%5)]
                 
