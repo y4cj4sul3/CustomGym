@@ -12,7 +12,7 @@ class OverCookedEnv_v2(gym.Env):
 
     def __init__(self, idx=0):
         # Environment Settings
-        self.random_task = False
+        self.random_task = True
         self.num_episode = 0
 
         self.is_record = True
@@ -219,7 +219,7 @@ class OverCookedEnv_v2(gym.Env):
                 # general setting
                 #task = np.random.randint(self.num_targets, size(num_task)) 
                 # [middle target, final target]
-                task = [np.random.randint(2), np.random.randint(5)]
+                task = [np.random.randint(2), 2+np.random.randint(5)]
             else:
                 task = [(self.num_episode%10)//5, 2+(self.num_episode%5)]
                 

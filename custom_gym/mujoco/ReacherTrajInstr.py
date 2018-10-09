@@ -14,7 +14,7 @@ class ReacherOverCookedEnv_v4(mujoco_env.MujocoEnv, utils.EzPickle):
         # recorder
         self.is_record = True
         if self.is_record:
-            self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v4/demo_2500/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         

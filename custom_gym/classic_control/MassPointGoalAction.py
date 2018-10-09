@@ -114,11 +114,11 @@ class FiveTargetEnv_v3(gym.Env):
             if dist < self.target_size:
                 done = True
                 if i == self.task:
-                    print('Right Target')
+                    #print('Right Target')
                     done_status = 'Right Target'
                     reward += 1
                 else:
-                    print('Wrong Target')
+                    #print('Wrong Target')
                     done_status = 'Wrong Target'
                     reward += -0.2
                 break
@@ -129,7 +129,7 @@ class FiveTargetEnv_v3(gym.Env):
             #if np.linalg.norm(np.array([xpos, ypos])) > self.arena_size:
                 done = True
                 reward += -1
-                print('Hit the Wall')
+                #print('Hit the Wall')
                 done_status = 'Hit the Wall'
         
         # times up
@@ -137,7 +137,7 @@ class FiveTargetEnv_v3(gym.Env):
         if not done and self.timesteps >= self.max_timesteps:
             done = True
             reward += -0.5
-            print('Times Up')
+            #print('Times Up')
             done_status = 'Times Up'
 
         return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}

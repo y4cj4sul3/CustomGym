@@ -12,10 +12,10 @@ class ReacherFiveTargetEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
         self.max_timesteps = 20
         self.timesteps = 0
         # recorder
-        self.is_record = True
+        self.is_record = False
         if self.is_record:
-            os.makedirs('Dataset/ReacherFiveTarget-v3/test/', exist_ok=True)
-            self.recorder = Recoder('Dataset/ReacherFiveTarget-v3/test/')
+            os.makedirs('Dataset/ReacherFiveTarget-v3/demo_2500/', exist_ok=True)
+            self.recorder = Recoder('Dataset/ReacherFiveTarget-v3/demo_2500/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         utils.EzPickle.__init__(self)
@@ -61,9 +61,6 @@ class ReacherFiveTargetEnv_v3(mujoco_env.MujocoEnv, utils.EzPickle):
             #if hasattr(self.recorder.traj, 'reward'):
             self.recorder.traj['reward'] += reward
             self.recorder.traj['coord'].append(self.get_body_com("fingertip").tolist())
-            #if done_status == 'Right Target':
-            #if done:
-            #    self.recorder.save()
         # get obs
         ob = self._get_obs()
         
