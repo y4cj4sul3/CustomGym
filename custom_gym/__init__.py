@@ -94,27 +94,34 @@ register(
 register(
     id='ReacherGEP-v0',
     entry_point='custom_gym.mujoco:ReacherGEPEnv',
-    max_episode_steps=50,
+    max_episode_steps=20,
     reward_threshold=-3.75,
 )
 
 register(
     id='ReacherGEPTest-v0',
     entry_point='custom_gym.mujoco:ReacherGEPTestEnv',
-    max_episode_steps=50,
+    max_episode_steps=20,
+    reward_threshold=-3.75,
+)
+
+register(
+    id='ReacherGEPTestTry-v0',
+    entry_point='custom_gym.mujoco:ReacherGEPTestTryEnv',
+    max_episode_steps=20,
     reward_threshold=-3.75,
 )
 
 register(
     id='ReacherGEPTraj-v0',
     entry_point='custom_gym.mujoco:ReacherGEPTrajEnv',
-    max_episode_steps=50,
+    max_episode_steps=20,
 )
 
 register(
     id='ReacherGEPTrajTest-v0',
     entry_point='custom_gym.mujoco:ReacherGEPTrajTestEnv',
-    max_episode_steps=50,
+    max_episode_steps=20,
 )
 
 register(

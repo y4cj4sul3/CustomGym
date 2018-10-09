@@ -63,7 +63,7 @@ class FiveTargetEnv_v1(gym.Env):
         mid_targets = [(np.cos(x) * 0.25, np.sin(x) * 0.25) for x in mid_targets]
         self.target_coord = np.concatenate((self.target_coord, mid_targets), axis=0)
         
-        print(self.target_coord)
+        #print(self.target_coord)
 
         self.target_size = 0.05
 
@@ -90,7 +90,9 @@ class FiveTargetEnv_v1(gym.Env):
 
     def step(self, action):
         # Check action
+        #print('action:', action)
         action = np.clip(action[0], self.low_action, self.high_action)
+        action *= 0.5
         assert self.action_space.contains(action), "%r (%s) invalid action" % (action, type(action))
 
         # States before simulate
@@ -162,28 +164,13 @@ class FiveTargetEnv_v1(gym.Env):
             if dist < self.target_size:
                 self.mid_done = True
                     #print('self.id',self.id)
-            '''if i == self.mid_ins:
-                print('Right Target')
-                reward += 1
-            else:
-                print('Wrong Target')
-                reward += -0.2
-            break'''
-            # hit the target
-            #for i in range(self.num_targets):
-            vec = np.array([xpos-self.target_coord[self.ins][0], ypos-self.target_coord[self.ins][1]])
-            dist = np.linalg.norm(vec)
-            if dist < self.target_size and self.mid_done:
-                done = True
-                print('Success')
+            if self.mid_done:
+                vec = np.array([xpos-self.target_coord[self.ins][0], ypos-self.target_coord[self.ins][1]])
+                dist = np.linalg.norm(vec)
+                if dist < self.target_size:
+                    done = True
+                    print('Success')
                     #print('self.id',self.id)
-            '''if i == self.ins:
-                print('Right Target')
-                reward += 1
-            else:
-                print('Wrong Target')
-                reward += -0.2
-            break'''
         elif self.id == 4: # goal evaluating [envType, nan, nan, targetX, targetY]
             vec = np.array([xpos-self.trainingTarget[2], ypos-self.trainingTarget[3]])
             dist = np.linalg.norm(vec)
@@ -199,14 +186,15 @@ class FiveTargetEnv_v1(gym.Env):
             if dist < self.target_size:
                 self.mid_done = True
                 #print('midSuccess')
-            vec = np.array([xpos-self.trainingTarget[2], ypos-self.trainingTarget[3]])
-            dist = np.linalg.norm(vec)
-            if dist < self.target_size and self.mid_done:
-                done = True
-                self.num_success += 1
-                print('Success')
-                print('Nsuccess', self.num_success)
-                #print('self.id',self.id)
+            if self.mid_done:
+                vec = np.array([xpos-self.trainingTarget[2], ypos-self.trainingTarget[3]])
+                dist = np.linalg.norm(vec)
+                if dist < self.target_size:
+                    done = True
+                    self.num_success += 1
+                    print('Success')
+                    print('Nsuccess', self.num_success)
+                    #print('self.id',self.id)
         else:
             print('Evelyn ErrorRRRRRRRRRRRRRRRRRRRRRRRRRR')
         
@@ -249,13 +237,13 @@ class FiveTargetEnv_v1(gym.Env):
                 self.trainingTarget[3] = np.random.sample() * 2 - 1
                 self.mid_done = True
             elif self.id == 2: # goal testing [envType, nan, instruction, nan, nan]
-                self.task[2] = task[2]
                 self.ins = int(self.task[2])
                 self.mid_done = True
             elif self.id == 3: # trajectory testing [envType, mid_instruction, instruction, nan, nan]
-                self.task[1:3] = task[1:3]
                 self.mid_ins = int(self.task[1])
                 self.ins = int(self.task[2])
+                #print('env receive ins:', self.mid_ins , ' ', self.ins)
+                #print('env ins target pos:', self.target_coord[self.mid_ins], ' ', self.target_coord[self.ins])
                 self.mid_done = False
             elif self.id == 4: # goal evaluating [envType, nan, nan, targetX, targetY]
                 self.trainingTarget[2:4] = task[3:5]
@@ -268,13 +256,13 @@ class FiveTargetEnv_v1(gym.Env):
                 self.task = np.array(task)
 
         self.instr = np.zeros(self.num_targets+self.num_mid_targets)
-
+        
         if self.id == 3:
-            print('ins:', self.mid_ins, ' ', self.ins)
+            #print('ins:', self.mid_ins, ' ', self.ins)
             self.instr = np.zeros(self.num_targets+self.num_mid_targets)
             self.instr[self.ins] = 1
             self.instr[self.mid_ins] = 1
-            #assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
+            assert self.instr_space.contains(self.instr), "%r (%s) invalid task" % (self.instr, type(self.instr))
 
             # Set target
             self.target_color = []
@@ -282,6 +270,7 @@ class FiveTargetEnv_v1(gym.Env):
                 self.target_color.append([0, 1, 0])
             self.target_color[self.ins] = [1, 0, 0]
             self.target_color[self.mid_ins] = [1, 0, 0]
+
         '''
         elif self.id == 2:
             # Instruction
@@ -323,7 +312,7 @@ class FiveTargetEnv_v1(gym.Env):
     def get_obs(self):
         # Observation
         # [agent coord] + instruction
-        obs = np.concatenate((self.state[0:2], self.instr[0:5]))
+        obs = np.concatenate((self.state[0:2], np.zeros(5)))
         assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
         return obs
 

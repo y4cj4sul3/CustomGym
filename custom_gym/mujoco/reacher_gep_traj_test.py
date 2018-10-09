@@ -7,13 +7,14 @@ from custom_gym.mujoco import mujoco_env
 class ReacherGEPTrajTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         self.timestep = 0
-        self.maxtimestep = 50
+        self.maxtimestep = 20
 
         mid_goal = np.array([[np.cos(np.deg2rad(45)), np.sin(np.deg2rad(45))], [np.cos(np.deg2rad(315)), np.sin(np.deg2rad(315))]])
         f_goal = []
         for x in range(5):
             f_goal.append([np.cos(np.deg2rad(180)) * x * 0.2 - 0.1, np.sin(np.deg2rad(180)) * x * 0.2])
         self.targetList = np.concatenate(([mid_goal, f_goal]), axis=0)
+        self.targetList *= 0.21
         #self.targetList = np.array([[0, .15], [-.1, .1], [-.2, 0], [-.1, -.1], [0, -.15], [.1, .1], [.1, -.1]])
         self.task = np.array([-1, -1])
         self.mid_done = False
@@ -41,6 +42,9 @@ class ReacherGEPTrajTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         if m_dist < self.zoneCheck:
             self.mid_done = True
             #print("Mid Success")
+
+        vec = self.get_body_com("fingertip")[0:2]-self.targetList[self.task[1]]
+        m_dist = np.linalg.norm(vec)
         if dist < self.zoneCheck and self.mid_done:
             done = True
             reward += 1
@@ -66,11 +70,11 @@ class ReacherGEPTrajTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         qpos = self.init_qpos
         if task is not None:
             self.task = task
-            qpos[2], qpos[3] = self.targetList[self.task[1]][0], self.targetList[self.task[0]][1]
+            qpos[2], qpos[3] = self.targetList[self.task[1]][0], self.targetList[self.task[1]][1]
             print('ins:', task)
             print('target pos:', self.targetList[task])
-        else:
-            print('Evelyn ErrorrrrRRR')
+        #else:
+            #print('Evelyn ErrorrrrRRR')
         
 
         # Velocity
@@ -82,7 +86,7 @@ class ReacherGEPTrajTestEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
         self.timestep = 0
-        self.maxtimestep = 50
+        self.maxtimestep = 20
         self.mid_done = False
         
         return self._get_obs()
