@@ -3,7 +3,7 @@ from gym import utils
 from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
 
-class ReacherOverCookedEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherOverCookedEnv_v4(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
         self.set_target()
@@ -12,9 +12,9 @@ class ReacherOverCookedEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         self.timesteps = 0
         
         # recorder
-        self.is_record = False
+        self.is_record = True
         if self.is_record:
-            self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v4/demo_2500/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         
@@ -91,7 +91,7 @@ class ReacherOverCookedEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
                 min_dist_cp = np.linalg.norm(np.array(self.recorder.traj['coord'][ctcp]-self.get_body_com('checkpoint')))
                 min_dist_ft = np.linalg.norm(np.array(self.recorder.traj['coord'][ctft]-self.get_body_com('true_target')))
                 #print(min_dist_cp, min_dist_ft)
-                self.recorder.save()
+                #self.recorder.save()
         
         # get obs
         ob = self._get_obs()
@@ -164,15 +164,18 @@ class ReacherOverCookedEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         #print(self.sim.data.qpos)
-        theta = self.sim.data.qpos.flat[:2]
+        #theta = self.sim.data.qpos.flat[:2]
+        xpos = self.get_body_com("fingertip")[0]/.21
+        ypos = self.get_body_com("fingertip")[1]/.21
         # Observation (13 dim)
         # [cos(angle_1), cos(angle_2),
         #  sin(angle_2), sin(angle_2),
         #  angle_vec_1, angle_vec_2,
         #  one_hot_instruction]
         return np.concatenate([
-            np.cos(theta),
-            np.sin(theta),
+            #np.cos(theta),
+            #np.sin(theta),
+            [xpos, ypos],
             self.sim.data.qvel.flat[:2],
             self.instr
         ])

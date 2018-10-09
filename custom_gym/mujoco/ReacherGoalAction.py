@@ -4,7 +4,7 @@ from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
 import os
 
-class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherFiveTargetEnv_v5(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
         self.set_target()
@@ -12,18 +12,18 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         self.max_timesteps = 20
         self.timesteps = 0
         # recorder
-        self.is_record = True
+        self.is_record = False
         if self.is_record:
-            os.makedirs('Dataset/ReacherFiveTarget-v1/test/', exist_ok=True)
-            self.recorder = Recoder('Dataset/ReacherFiveTarget-v1/test/')
+            os.makedirs('Dataset/ReacherFiveTarget-v3/test/', exist_ok=True)
+            self.recorder = Recoder('Dataset/ReacherFiveTarget-v3/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
-        
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher_five_target_v1.xml', 2)
 
     def step(self, a):
         # sim
+        a = np.array(a) * 0.9
         self.do_simulation(a, self.frame_skip)
 
         # after sim
@@ -40,7 +40,7 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         if dist < 0.019:
             done = True
             reward += 1
-            print('Right Target')
+            #print('Right Target')
             done_status = 'Right Target'
         '''
         # TODO: wrong target
@@ -54,7 +54,7 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         if not done and self.timesteps >= self.max_timesteps:
             done = True
             reward += -0.5
-            print('Times Up')
+            #print('Times Up')
             done_status = 'Times Up'
         # record
         if self.is_record:
@@ -63,8 +63,8 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
             self.recorder.traj['reward'] += reward
             self.recorder.traj['coord'].append(self.get_body_com("fingertip").tolist())
             #if done_status == 'Right Target':
-            if done:
-                self.recorder.save()
+            #if done:
+            #    self.recorder.save()
         # get obs
         ob = self._get_obs()
         
@@ -79,7 +79,7 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
             self.target_id = np.random.randint(5)
         else:
             self.target_id = target_id
-        print('Current Target: {}'.format(self.target_id))
+        #print('Current Target: {}'.format(self.target_id))
 
         # instruction (one-hot)
         self.target_one_hot = np.zeros(5)
@@ -106,7 +106,7 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         qvel = np.zeros(12)
 
         self.set_state(qpos, qvel)
-        
+
         if self.is_record:
             # save traj
             ### self.recorder.save()
@@ -121,15 +121,18 @@ class ReacherFiveTargetEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         #print(self.sim.data.qpos)
-        theta = self.sim.data.qpos.flat[:2]
+        #theta = self.sim.data.qpos.flat[:2]
+        xpos = self.get_body_com("fingertip")[0]/.21
+        ypos = self.get_body_com("fingertip")[1]/.21
         # Observation (11 dim)
         # [cos(angle_1), cos(angle_2),
         #  sin(angle_2), sin(angle_2),
         #  angle_vec_1, angle_vec_2,
         #  one_hot_instruction]
         return np.concatenate([
-            np.cos(theta),
-            np.sin(theta),
+            #np.cos(theta),
+            #np.sin(theta),
+            [xpos, ypos],
             self.sim.data.qvel.flat[:2],
             self.target_one_hot
         ])

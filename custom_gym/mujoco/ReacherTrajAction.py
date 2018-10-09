@@ -2,20 +2,19 @@ import numpy as np
 from gym import utils
 from custom_gym.mujoco import mujoco_env
 from custom_gym.utils import Recoder
-import os
 
-class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
+class ReacherOverCookedEnv_v5(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
         # random init target
         self.set_target()
         # timestep
         self.max_timesteps = 20
         self.timesteps = 0
+        
         # recorder
         self.is_record = True
         if self.is_record:
-            os.makedirs('Dataset/ReacherOverCooked-v1/test/', exist_ok=True)
-            self.recorder = Recoder('Dataset/ReacherOverCooked-v1/test/')
+            self.recorder = Recoder('Dataset/ReacherOverCooked-v3/test/')
             self.recorder.traj['reward'] = 0
             self.recorder.traj['coord'] = []
         
@@ -23,6 +22,8 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
         mujoco_env.MujocoEnv.__init__(self, 'reacher_over_cooked.xml', 2)
 
     def step(self, a):
+        a = np.array(a) * 0.9
+
         # sim
         self.do_simulation(a, self.frame_skip)
 
@@ -154,15 +155,18 @@ class ReacherOverCookedEnv_v1(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         #print(self.sim.data.qpos)
-        theta = self.sim.data.qpos.flat[:2]
+        #theta = self.sim.data.qpos.flat[:2]
+        xpos = self.get_body_com("fingertip")[0]/.21
+        ypos = self.get_body_com("fingertip")[1]/.21
         # Observation (13 dim)
         # [cos(angle_1), cos(angle_2),
         #  sin(angle_2), sin(angle_2),
         #  angle_vec_1, angle_vec_2,
         #  one_hot_instruction]
         return np.concatenate([
-            np.cos(theta),
-            np.sin(theta),
+            #np.cos(theta),
+            #np.sin(theta),
+            [xpos, ypos],
             self.sim.data.qvel.flat[:2],
             self.instr
         ])
