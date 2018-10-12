@@ -13,6 +13,8 @@ custom_gym/classic_control/decrepated
 # MuJoCo
 custom_gym/mujoco/decrepated
 
+# Testing
+test_data
 
 # IOS stuff
 .DS_Store
