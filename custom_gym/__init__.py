@@ -1,54 +1,24 @@
 from custom_gym.utils.recoder import Recoder
+from custom_gym.utils import RecorderWrapper
 from gym.envs.registration import register
 
 # classic control
 
-#register(
-#    id='MountainCarEx-v0',
-#    entry_point='custom_gym.classic_control:MountainCarEnv',
-#    max_episode_steps=200,
-#    reward_threshold=-110.0,
-#)
-#
-#register(
-#    id='MassPoint-v0',
-#    entry_point='custom_gym.classic_control:MassPointEnv',
-#    max_episode_steps=200,
-#)
-#
-#register(
-#    id='MassPoint-v1',
-#    entry_point='custom_gym.classic_control:MassPointEnv_v1',
-#    max_episode_steps=200,
-#)
-
-#register(
-#    id='MassPointGEP-v0',
-#    entry_point='custom_gym.classic_control:MassPointGEPEnv',
-#    max_episode_steps=200,
-#)
-
-#register(
-#    id='FiveTarget-v0',
-#    entry_point='custom_gym.classic_control:FiveTargetEnv',
-#    max_episode_steps=200,
-#)
-
 register(
     id='MassPointGoal-v0',
-    entry_point='custom_gym.classic_control:FiveTargetEnv_v1',
+    entry_point='custom_gym.classic_control:MassPointGoalEnv',
     max_episode_steps=200,
 )
 
 register(
     id='MassPointGoalInstr-v0',
-    entry_point='custom_gym.classic_control:FiveTargetEnv_v2',
+    entry_point='custom_gym.classic_control:MassPointGoalInstrEnv',
     max_episode_steps=200,
 )
 
 register(
     id='MassPointGoalAction-v0',
-    entry_point='custom_gym.classic_control:FiveTargetEnv_v3',
+    entry_point='custom_gym.classic_control:MassPointGoalActionEnv',
     max_episode_steps=200,
 )
 
@@ -78,19 +48,19 @@ register(
 
 register(
     id = 'MassPointTraj-v0',
-    entry_point='custom_gym.classic_control:OverCookedEnv',
+    entry_point='custom_gym.classic_control:MassPointTrajEnv',
     max_episode_steps=200,
 )
 
 register(
     id = 'MassPointTrajInstr-v0',
-    entry_point='custom_gym.classic_control:OverCookedEnv_v1',
+    entry_point='custom_gym.classic_control:MassPointTrajInstrEnv',
     max_episode_steps=200,
 )
 
 register(
     id = 'MassPointTrajAction-v0',
-    entry_point='custom_gym.classic_control:OverCookedEnv_v2',
+    entry_point='custom_gym.classic_control:MassPointTrajActionEnv',
     max_episode_steps=200,
 )
 

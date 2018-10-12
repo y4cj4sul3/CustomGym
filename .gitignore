@@ -7,6 +7,9 @@ custom_gym.egg-info
 # Unity executable
 custom_gym/unity/assets
 
+# Classic control
+custom_gym/classic_control/decrepated
+
 # MuJoCo
 custom_gym/mujoco/decrepated
 
