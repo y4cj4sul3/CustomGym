@@ -112,7 +112,7 @@ class MassPointGoalEnv(gym.Env):
             if dist_i < self.target_size:
                 done = True
                 if i == self.task:
-                    done_status = 'Right Target'
+                    done_status = 'Finish Task'
                     reward += 1
                 else:
                     done_status = 'Wrong Target'

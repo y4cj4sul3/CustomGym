@@ -5,7 +5,11 @@ import os
 
 class RecorderWrapper:
 
-    def __init__(self, env, file_path, file_format='pickle', jsonify=False, len_threshold=0):
+    def __init__(self, env, file_path, file_format='pickle', jsonify=False, len_threshold=0, save_on_finish=False):
+        '''
+        file_format: only pickle and json currently
+        save_on_finish: save file only when finish the task
+        '''
 
         # gym environmant
         self.unwrapped = env
@@ -28,6 +32,7 @@ class RecorderWrapper:
 
         # parameters
         self.len_threshold = len_threshold
+        self.save_on_finish = save_on_finish
         # episode count
         self.count = 0
 
@@ -101,7 +106,8 @@ class RecorderWrapper:
         # save when episode ends
         # TODO additional custom condition 
         if done:
-           self.save()
+            if (not self.save_on_finish) or info['done_status'] == 'Finish Task':
+                self.save()
 
         return obs, rew, done, info
     
