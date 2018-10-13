@@ -3,7 +3,7 @@ from gym import spaces
 from gym.utils import seeding
 import numpy as np
 
-class MassPointTrajEnv(gym.Env):
+class MassPointTrajEnv_v1(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -25,10 +25,10 @@ class MassPointTrajEnv(gym.Env):
         
         self.instr_space = spaces.Box(self.low_instr, self.high_instr, dtype=np.float32)
 
-        # Define Action Space (2 dim)
-        # [forward_speed, rotate]
-        self.high_action = np.array([1, 1])
-        self.low_action = np.array([0, -1])
+        # Define Action Space (1 dim)
+        # [rotate]
+        self.high_action = np.array([1])
+        self.low_action = np.array([-1])
         
         self.action_space = spaces.Box(self.low_action, self.high_action, dtype=np.float32)
         
@@ -87,7 +87,7 @@ class MassPointTrajEnv(gym.Env):
         
         # States before simulate
         xpos, ypos, xface, yface = self.state
-        f_speed, rotate = action
+        rotate = action[0]
         theta = np.arctan2(yface, xface)
 
         # Simulate
@@ -96,8 +96,8 @@ class MassPointTrajEnv(gym.Env):
         xface = np.cos(theta)
         yface = np.sin(theta)
         # update position
-        xpos = xpos + xface*self.speed_scale*f_speed
-        ypos = ypos + yface*self.speed_scale*f_speed
+        xpos = xpos + xface*self.speed_scale
+        ypos = ypos + yface*self.speed_scale
 
         # States after simulate
         self.state = [xpos, ypos, xface, yface]

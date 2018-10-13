@@ -4,9 +4,9 @@ from custom_gym import RecorderWrapper
 import numpy as np
 
 # Create Environment      #TODO: arg
-env = gym.make('MassPointGoal-v0')
-#env = gym.make('MassPointGoalInstr-v0')
-#env = gym.make('MassPointGoalAction-v0')
+env = gym.make('MassPointGoal-v1')
+#env = gym.make('MassPointGoalInstr-v1')
+#env = gym.make('MassPointGoalAction-v1')
 
 # Recorder
 is_record = True          #TODO: arg
@@ -66,7 +66,7 @@ for task_id in range(5):
             env.render()
             
             # Interact with Environment
-            action = [1, 0]
+            action = [0]
             # target direction & delta angle
             target_dir = target - agent
             cos_theta = np.sum(target_dir * face) / (np.linalg.norm(target_dir)*np.linalg.norm(face))
@@ -81,11 +81,8 @@ for task_id in range(5):
                     dir_sign = -1
                   
                 delta_theta = np.clip(delta_theta, -1, 1)
-                action[1] = dir_sign * delta_theta / rotate_scale
-                action[1] = np.clip(action[1], -1, 1)
-        
-            else:
-                action[0] = 1
+                action[0] = dir_sign * delta_theta / rotate_scale
+                action[0] = np.clip(action[0], -1, 1)
             
             expert_action = np.array(action)
             

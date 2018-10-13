@@ -4,12 +4,12 @@ import custom_gym
 from custom_gym import RecorderWrapper
 
 # Create Environment
-#env = gym.make('MassPointGoal-v0')
-#env = gym.make('MassPointGoalInstr-v0')
-env = gym.make('MassPointGoalAction-v0')
-#env = gym.make('MassPointTraj-v0')
-#env = gym.make('MassPointTrajInstr-v0')
-#env = gym.make('MassPointTrajAction-v0')
+#env = gym.make('MassPointGoal-v1')
+#env = gym.make('MassPointGoalInstr-v1')
+#env = gym.make('MassPointGoalAction-v0')
+env = gym.make('MassPointTraj-v1')
+#env = gym.make('MassPointTrajInstr-v1')
+#env = gym.make('MassPointTrajAction-v1')
 #env = gym.make('ReacherGoal-v0')
 
 # Print action & observation space
@@ -20,7 +20,7 @@ print(env.observation_space)
 #env = wrappers.Monitor(env, './Movie', force=True)
 
 # Record trajectory
-env = RecorderWrapper(env, './test_data/', file_format='json')
+#env = RecorderWrapper(env, './test_data/', file_format='json')
 
 # Test Environment
 for i_episode in range(1):

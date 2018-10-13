@@ -13,7 +13,7 @@ class MassPointGoalEnv(gym.Env):
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
-        self.speed_scale = 0.05
+        self.speed_scale = 0.06
         self.rotate_scale = 0.3
         self.num_targets = 5
         
