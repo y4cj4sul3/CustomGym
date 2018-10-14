@@ -101,99 +101,99 @@ register(
     
 )
 
-# mujoco
+### mujoco
 
-#register(
+# register(
 #    id='ReacherEx-v0',
 #    entry_point='custom_gym.mujoco:ReacherEnv',
 #    max_episode_steps=50,
 #    reward_threshold=-3.75,
-#)
-#
-#register(
+# )
+
+# register(
 #    id='ReacherGEP-v0',
 #    entry_point='custom_gym.mujoco:ReacherGEPEnv',
 #    max_episode_steps=50,
 #    reward_threshold=-3.75,
-#)
-#
-#register(
+# )
+
+# register(
 #    id='ReacherFiveTarget-v0',
 #    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv',
 #    max_episode_steps = 50,
 #    reward_threshold=-3.75,
-#)
+# )
 
-#register(
+# register(
 #    id='ReacherFiveTarget-v1',
 #    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v1',
 #    max_episode_steps = 50,
 #    reward_threshold=-3.75,
-#)
-#
-#register(
+# )
+
+# register(
 #    id='ReacherFiveTarget-v2',
 #    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v2',
 #    max_episode_steps = 50,
 #    reward_threshold=-3.75,
-#)
+# )
 
 register(
     id='ReacherGoal-v0',
-    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v3',
+    entry_point='custom_gym.mujoco:ReacherGoal',
     max_episode_steps = 50,
     reward_threshold=-3.75,
 )
 
 register(
     id='ReacherGoalInstr-v0',
-    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v4',
+    entry_point='custom_gym.mujoco:ReacherGoalInstr',
     max_episode_steps = 50,
     reward_threshold=-3.75,
 )
 
 register(
     id='ReacherGoalAction-v0',
-    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v5',
+    entry_point='custom_gym.mujoco:ReacherGoalAction',
     max_episode_steps = 50,
     reward_threshold=-3.75,
 )
 
-#register(
+# register(
 #    id='ReacherOverCooked-v0',
 #    entry_point='custom_gym.mujoco:ReacherOverCookedEnv',
 #    max_episode_steps = 50,
 #    reward_threshold=-3.75,
-#)
-#
-#register(
+# )
+
+# register(
 #    id='ReacherOverCooked-v1',
 #    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v1',
 #    max_episode_steps = 50,
 #    reward_threshold=-3.75,
-#)
-#
-#register(
+# )
+
+# register(
 #    id='ReacherOverCooked-v2',
 #    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v2',
 #    max_episode_steps = 50,
 #    reward_threshold=-3.75,
-#)
+# )
 
 register(
     id='ReacherTraj-v0',
-    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v3',
+    entry_point='custom_gym.mujoco:ReacherTraj',
     max_episode_steps = 50,
 )
 
 register(
     id='ReacherTrajInstr-v0',
-    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v4',
+    entry_point='custom_gym.mujoco:ReacherTrajInstr',
     max_episode_steps = 50,
 )
 
 register(
     id='ReacherTrajAction-v0',
-    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v5',
+    entry_point='custom_gym.mujoco:ReacherTrajAction',
     max_episode_steps = 50,
 )

@@ -5,7 +5,7 @@ import custom_gym
 # Create Environment
 #env = gym.make('MountainCarEx-v0')
 #env = gym.make('Kobuki-v0')
-env = gym.make('ReacherFiveTarget-v1')
+env = gym.make('ReacherGoal-v1')
 
 # Print action & observation space
 print(env.action_space)
