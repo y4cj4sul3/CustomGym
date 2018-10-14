@@ -1,99 +1,84 @@
 from custom_gym.utils.recoder import Recoder
+from custom_gym.utils import RecorderWrapper
 from gym.envs.registration import register
 
 # classic control
-
-#register(
-#    id='MountainCarEx-v0',
-#    entry_point='custom_gym.classic_control:MountainCarEnv',
-#    max_episode_steps=200,
-#    reward_threshold=-110.0,
-#)
-#
-#register(
-#    id='MassPoint-v0',
-#    entry_point='custom_gym.classic_control:MassPointEnv',
-#    max_episode_steps=200,
-#)
-#
-#register(
-#    id='MassPoint-v1',
-#    entry_point='custom_gym.classic_control:MassPointEnv_v1',
-#    max_episode_steps=200,
-#)
-
-#register(
-#    id='MassPointGEP-v0',
-#    entry_point='custom_gym.classic_control:MassPointGEPEnv',
-#    max_episode_steps=200,
-#)
-
-#register(
-#    id='FiveTarget-v0',
-#    entry_point='custom_gym.classic_control:FiveTargetEnv',
-#    max_episode_steps=200,
-#)
-
+# Goal
 register(
     id='MassPointGoal-v0',
-    entry_point='custom_gym.classic_control:FiveTargetEnv_v1',
+    entry_point='custom_gym.classic_control:MassPointGoalEnv',
     max_episode_steps=200,
 )
 
 register(
     id='MassPointGoalInstr-v0',
-    entry_point='custom_gym.classic_control:FiveTargetEnv_v2',
+    entry_point='custom_gym.classic_control:MassPointGoalInstrEnv',
     max_episode_steps=200,
 )
 
 register(
     id='MassPointGoalAction-v0',
-    entry_point='custom_gym.classic_control:FiveTargetEnv_v3',
+    entry_point='custom_gym.classic_control:MassPointGoalActionEnv',
     max_episode_steps=200,
 )
-
-#register(
-#    id='FiveTargetColor-v0',
-#    entry_point='custom_gym.classic_control:FiveTargetColorEnv',
-#    max_episode_steps=200,
-#)
-
-#register(
-#    id='FiveTargetColor-v1',
-#    entry_point='custom_gym.classic_control:FiveTargetColorV1Env',
-#    max_episode_steps=200,
-#)
-
-#register(
-#    id='FiveTargetRandColor-v0',
-#    entry_point='custom_gym.classic_control:FiveTargetRandColorEnv',
-#    max_episode_steps=200,
-#)
-
-#register(
-#    id='FiveTargetRandColor-v2',
-#    entry_point='custom_gym.classic_control:FiveTargetRandColorEnv_v2',
-#    max_episode_steps=200,
-#)
-
+# Traj
 register(
     id = 'MassPointTraj-v0',
-    entry_point='custom_gym.classic_control:OverCookedEnv',
+    entry_point='custom_gym.classic_control:MassPointTrajEnv',
     max_episode_steps=200,
 )
 
 register(
     id = 'MassPointTrajInstr-v0',
-    entry_point='custom_gym.classic_control:OverCookedEnv_v1',
+    entry_point='custom_gym.classic_control:MassPointTrajInstrEnv',
     max_episode_steps=200,
 )
 
 register(
     id = 'MassPointTrajAction-v0',
-    entry_point='custom_gym.classic_control:OverCookedEnv_v2',
+    entry_point='custom_gym.classic_control:MassPointTrajActionEnv',
     max_episode_steps=200,
 )
 
+# Goal v1
+register(
+    id = 'MassPointGoal-v1',
+    entry_point='custom_gym.classic_control:MassPointGoalEnv_v1',
+    max_episode_steps=200,
+)
+
+register(
+    id = 'MassPointGoalInstr-v1',
+    entry_point='custom_gym.classic_control:MassPointGoalInstrEnv_v1',
+    max_episode_steps=200,
+)
+
+register(
+    id = 'MassPointGoalAction-v1',
+    entry_point='custom_gym.classic_control:MassPointGoalActionEnv_v1',
+    max_episode_steps=200,
+)
+
+# Traj v1
+register(
+    id = 'MassPointTraj-v1',
+    entry_point='custom_gym.classic_control:MassPointTrajEnv_v1',
+    max_episode_steps=200,
+)
+
+register(
+    id = 'MassPointTrajInstr-v1',
+    entry_point='custom_gym.classic_control:MassPointTrajInstrEnv_v1',
+    max_episode_steps=200,
+)
+
+register(
+    id = 'MassPointTrajAction-v1',
+    entry_point='custom_gym.classic_control:MassPointTrajActionEnv_v1',
+    max_episode_steps=200,
+)
+
+#=======================================
 # unity
 register(
     id='Kobuki-v0',
@@ -101,43 +86,8 @@ register(
     
 )
 
-### mujoco
-
-# register(
-#    id='ReacherEx-v0',
-#    entry_point='custom_gym.mujoco:ReacherEnv',
-#    max_episode_steps=50,
-#    reward_threshold=-3.75,
-# )
-
-# register(
-#    id='ReacherGEP-v0',
-#    entry_point='custom_gym.mujoco:ReacherGEPEnv',
-#    max_episode_steps=50,
-#    reward_threshold=-3.75,
-# )
-
-# register(
-#    id='ReacherFiveTarget-v0',
-#    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv',
-#    max_episode_steps = 50,
-#    reward_threshold=-3.75,
-# )
-
-# register(
-#    id='ReacherFiveTarget-v1',
-#    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v1',
-#    max_episode_steps = 50,
-#    reward_threshold=-3.75,
-# )
-
-# register(
-#    id='ReacherFiveTarget-v2',
-#    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v2',
-#    max_episode_steps = 50,
-#    reward_threshold=-3.75,
-# )
-
+# =================== mujoco ===================
+# Goal
 register(
     id='ReacherGoal-v0',
     entry_point='custom_gym.mujoco:ReacherGoal',
@@ -159,27 +109,7 @@ register(
     reward_threshold=-3.75,
 )
 
-# register(
-#    id='ReacherOverCooked-v0',
-#    entry_point='custom_gym.mujoco:ReacherOverCookedEnv',
-#    max_episode_steps = 50,
-#    reward_threshold=-3.75,
-# )
-
-# register(
-#    id='ReacherOverCooked-v1',
-#    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v1',
-#    max_episode_steps = 50,
-#    reward_threshold=-3.75,
-# )
-
-# register(
-#    id='ReacherOverCooked-v2',
-#    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v2',
-#    max_episode_steps = 50,
-#    reward_threshold=-3.75,
-# )
-
+# Traj
 register(
     id='ReacherTraj-v0',
     entry_point='custom_gym.mujoco:ReacherTraj',

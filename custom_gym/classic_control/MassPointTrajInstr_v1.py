@@ -1,7 +1,7 @@
 import numpy as np
-from custom_gym.classic_control import MassPointTrajEnv
+from custom_gym.classic_control import MassPointTrajEnv_v1
 
-class MassPointTrajInstrEnv(MassPointTrajEnv):
+class MassPointTrajInstrEnv_v1(MassPointTrajEnv_v1):
     
     def reset(self, task=None, num_task=2):
         obs = super().reset(task, num_task)

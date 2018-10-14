@@ -1,7 +1,7 @@
 import numpy as np
-from custom_gym.classic_control import MassPointGoalEnv
+from custom_gym.classic_control import MassPointTrajEnv_v1
 
-class MassPointGoalActionEnv(MassPointGoalEnv):
+class MassPointTrajActionEnv_v1(MassPointTrajEnv_v1):
 
     def step(self, action):
         # Change Action

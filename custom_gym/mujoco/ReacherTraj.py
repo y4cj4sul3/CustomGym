@@ -40,7 +40,8 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
         # check done
         self.timesteps += 1
         reward, done, done_status = self._collision_detection(stage, dist, reward)
-        
+        if done_status != "": print(done_status)
+
         # recording
         self.a, self.reward, self.done = a, reward, done
         min_dist_cp, min_dist_ft = self._call_recorder("step")
@@ -96,11 +97,11 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
                 reward += 0.5
             else:
                 reward += 1
-            return reward, True, 'Finish Task'
+            return reward, True, "Finish Task"
         if self.timesteps >= self.max_timesteps:
             reward += -0.5
-            return reward, True, 'Times Up'
-        return reward, False, ''
+            return reward, True, "Times Up"
+        return reward, False, ""
 
     def _call_recorder(self, command):
         if command == "reset":
