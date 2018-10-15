@@ -23,7 +23,7 @@ print(env.observation_space)
 #env = RecorderWrapper(env, './test_data/', file_format='json')
 
 # Test Environment
-for i_episode in range(1):
+for i_episode in range(10):
 
     # Reset Environment
     obs = env.reset()

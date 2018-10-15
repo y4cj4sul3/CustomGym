@@ -9,7 +9,10 @@ class MassPointGoalEnv_v1(gym.Env):
         'video.frames_per_second': 30
     }
 
-    def __init__(self, idx=0):
+    def __init__(self):
+        # Settings
+        self.random_task = True # this should be True when training
+
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
@@ -62,6 +65,9 @@ class MassPointGoalEnv_v1(gym.Env):
         # Timestep
         self.max_timesteps = 200
         self.timesteps = 0
+
+        # Episode
+        self.episode = 0
 
         self.seed()
         self.reset()
@@ -133,13 +139,23 @@ class MassPointGoalEnv_v1(gym.Env):
             reward += -0.5
             done_status = 'Times Up'
 
+        # episode count
+        if done:
+            self.episode = (self.episode + 1) % self.num_targets
+
         return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
 
     def reset(self, task=None):
         
         # Task
         if task is None:
-            task = np.random.randint(self.num_targets)
+            if self.random_task:
+                # random task
+                task = np.random.randint(self.num_targets)
+            else:
+                # increasing task
+                task = self.episode
+                
         self.task = np.array(task)
         
         # Instruction

@@ -10,6 +10,9 @@ class MassPointTrajEnv_v1(gym.Env):
     }
 
     def __init__(self, idx=0):
+        # Settings
+        self.random_task = True # this should be True when training
+
         # Parameters      
         self.min_pos = -1
         self.max_pos = 1
@@ -73,6 +76,9 @@ class MassPointTrajEnv_v1(gym.Env):
         # Trajectory (for calculate performance)
         self.traj = []
 
+        # Episode
+        self.episode = 0
+
         self.seed()
         self.reset()
     
@@ -120,7 +126,7 @@ class MassPointTrajEnv_v1(gym.Env):
         reward += self.task_penalty
         if self.task_penalty > 0:
             #print('Task: {}'.format(self.task_penalty))
-            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale))
+            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale/2))
         
         done_status = ''
         # hit the target
@@ -177,6 +183,9 @@ class MassPointTrajEnv_v1(gym.Env):
             min_dist_cp = np.linalg.norm(self.traj[ctcp]-self.target_coord[self.fixed_task[0]])
             min_dist_ft = np.linalg.norm(self.traj[ctft]-self.target_coord[self.fixed_task[1]])
 
+            # episode
+            self.episode = (self.episode + 1) % 10
+
         return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist, 'min_dist_cp': min_dist_cp, 'min_dist_ft': min_dist_ft}
 
     def reset(self, task=None, num_task=2):
@@ -184,8 +193,11 @@ class MassPointTrajEnv_v1(gym.Env):
         # Task
         # sequence of target to visit
         if task is None:
-            # [middle target, final target]
-            task = [np.random.randint(2), 2+np.random.randint(5)]
+            if self.random_task:
+                # [middle target, final target]
+                task = [np.random.randint(2), 2 + np.random.randint(5)]
+            else:
+                task = [self.episode // 5, 2 + self.episode % 5]
                 
         self.task = np.array(task)
         self.finished_task = []
