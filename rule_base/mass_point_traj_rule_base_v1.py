@@ -70,8 +70,6 @@ for i_episode in range(10):
   while True:
     # Render Environment
     env.render()
-    import time
-    time.sleep(0.1)
     # Interact with Environment
     action = [0]
     # target direction & delta angle
