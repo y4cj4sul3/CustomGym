@@ -85,26 +85,26 @@ register(
     entry_point='custom_gym.unity:KobukiEnv',
     
 )
-#=======================================
-# mujoco
+
+# =================== mujoco ===================
 # Goal
 register(
     id='ReacherGoal-v0',
-    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v3',
+    entry_point='custom_gym.mujoco:ReacherGoal',
     max_episode_steps = 50,
     reward_threshold=-3.75,
 )
 
 register(
     id='ReacherGoalInstr-v0',
-    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v4',
+    entry_point='custom_gym.mujoco:ReacherGoalInstr',
     max_episode_steps = 50,
     reward_threshold=-3.75,
 )
 
 register(
     id='ReacherGoalAction-v0',
-    entry_point='custom_gym.mujoco:ReacherFiveTargetEnv_v5',
+    entry_point='custom_gym.mujoco:ReacherGoalAction',
     max_episode_steps = 50,
     reward_threshold=-3.75,
 )
@@ -112,18 +112,18 @@ register(
 # Traj
 register(
     id='ReacherTraj-v0',
-    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v3',
+    entry_point='custom_gym.mujoco:ReacherTraj',
     max_episode_steps = 50,
 )
 
 register(
     id='ReacherTrajInstr-v0',
-    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v4',
+    entry_point='custom_gym.mujoco:ReacherTrajInstr',
     max_episode_steps = 50,
 )
 
 register(
     id='ReacherTrajAction-v0',
-    entry_point='custom_gym.mujoco:ReacherOverCookedEnv_v5',
+    entry_point='custom_gym.mujoco:ReacherTrajAction',
     max_episode_steps = 50,
 )
