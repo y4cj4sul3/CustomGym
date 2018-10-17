@@ -18,7 +18,7 @@ env_id = args.env_id
 is_record = args.is_record
 is_for_bc = args.is_for_bc
 save_on_finish = args.save_on_finish
-file_path = args.file_path
+file_path = args.file_path + args.env_id + '/'
 file_format = args.file_format
 
 # Create Environment
@@ -42,7 +42,7 @@ rotate_scale = 0.3
 threshold = rotate_scale * 0.01
 
 # Test Environment
-for i_episode in range(10):
+for i_episode in range(2500):
   # Reset Environment
   obs = env.reset()
   # specify target

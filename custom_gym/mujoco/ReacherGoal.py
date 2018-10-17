@@ -72,7 +72,7 @@ class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
     def _get_obs(self):
         pos = self.get_body_com("fingertip") / 0.21
         return np.concatenate([
-            pos,
+            pos[:2],
             self.sim.data.qvel.flat[:2],
             self.target_one_hot
         ])

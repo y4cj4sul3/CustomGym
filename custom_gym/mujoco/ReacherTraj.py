@@ -86,7 +86,7 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
         print('Instruction: {}'.format(self.instr))
 
     def _get_obs(self):
-        pos = self.get_body_com("fingertip") / 0.21
+        pos = (self.get_body_com("fingertip") / 0.21)[:2]
         q_vel = self.sim.data.qvel.flat[:2]
         return np.concatenate([pos, q_vel, self.instr])
 

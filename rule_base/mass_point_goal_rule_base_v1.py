@@ -2,17 +2,20 @@ import gym
 import custom_gym
 from custom_gym import RecorderWrapper
 import numpy as np
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--env-id', type=str)
+args = parser.parse_args()
 
 # Create Environment      #TODO: arg
-env = gym.make('MassPointGoal-v1')
-#env = gym.make('MassPointGoalInstr-v1')
-#env = gym.make('MassPointGoalAction-v1')
+env = gym.make(args.env_id)
 
 # Recorder
 is_record = True          #TODO: arg
 is_for_bc = True          #TODO: arg
 save_on_finish = False    #TODO: arg
-file_path = './dataset/'  #TODO: arg
+file_path = './dataset/%s/' % (args.env_id)  #TODO: arg
 file_format = 'json'      #TODO: arg
 
 if is_record:
@@ -35,7 +38,8 @@ rotate_scale = 0.3
 threshold = rotate_scale * 0.01
 
 # Test Environment
-for task_id in range(5):
+for i in range(2500):
+    task_id = np.random.randint(5)
 
     episode = 0
     while episode < episode_per_task:
