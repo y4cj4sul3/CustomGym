@@ -126,7 +126,7 @@ class MassPointTrajEnv_v1(gym.Env):
         reward += self.task_penalty
         if self.task_penalty > 0:
             #print('Task: {}'.format(self.task_penalty))
-            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale/2))
+            self.task_penalty = np.max((0, self.task_penalty-self.speed_scale/3))
         
         done_status = ''
         # hit the target
