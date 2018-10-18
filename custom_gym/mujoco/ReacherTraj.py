@@ -95,7 +95,7 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
             if stage == 0:
                 self.target_id = self.target_id[1:]
                 reward += 0.5
-                return reward, True, "Right Target"
+                return reward, False, "Right Target"
             else:
                 reward += 1
                 return reward, True, "Finish Task"

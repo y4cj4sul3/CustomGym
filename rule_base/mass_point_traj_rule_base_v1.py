@@ -12,6 +12,7 @@ parser.add_argument('--is-for-bc', type=bool, default=True)
 parser.add_argument('--save-on-finish', type=bool, default=False)
 parser.add_argument('--file-path', type=str, default='./dataset/')
 parser.add_argument('--file-format', type=str, default='json')
+parser.add_argument('--change-action', type=bool, default=False)
 args = parser.parse_args()
 
 env_id = args.env_id
@@ -20,6 +21,7 @@ is_for_bc = args.is_for_bc
 save_on_finish = args.save_on_finish
 file_path = args.file_path + args.env_id + '/'
 file_format = args.file_format
+change_action = args.change_action
 
 # Create Environment
 env = gym.make(env_id)
@@ -42,7 +44,7 @@ rotate_scale = 0.3
 threshold = rotate_scale * 0.01
 
 # Test Environment
-for i_episode in range(2500):
+for i_episode in range(10000):
   # Reset Environment
   obs = env.reset()
   # specify target
@@ -69,7 +71,7 @@ for i_episode in range(2500):
   # Run Episode
   while True:
     # Render Environment
-    env.render()
+    # env.render()
     # Interact with Environment
     action = [0]
     # target direction & delta angle
@@ -88,7 +90,9 @@ for i_episode in range(2500):
       delta_theta = np.clip(delta_theta, -1, 1)
       action[0] = dir_sign * delta_theta / rotate_scale
       action[0] = np.clip(action[0], -1, 1)
-
+    
+    if change_action: action[0] = action[0] * -1
+    print(action)
     expert_action = np.array(action)
 
     # hack expert action for bc

@@ -6,6 +6,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-id', type=str)
+parser.add_argument('--change-action', type=bool, default=False)
 args = parser.parse_args()
 
 # Create Environment      #TODO: arg
@@ -17,6 +18,7 @@ is_for_bc = True          #TODO: arg
 save_on_finish = False    #TODO: arg
 file_path = './dataset/%s/' % (args.env_id)  #TODO: arg
 file_format = 'json'      #TODO: arg
+change_action = args.change_action 
 
 if is_record:
     env = RecorderWrapper(env, file_path, file_format=file_format, save_on_finish=save_on_finish)
@@ -38,7 +40,7 @@ rotate_scale = 0.3
 threshold = rotate_scale * 0.01
 
 # Test Environment
-for i in range(2500):
+for i in range(10000):
     task_id = np.random.randint(5)
 
     episode = 0
@@ -67,8 +69,7 @@ for i in range(2500):
         # Run Episode
         while True:
             # Render Environment
-            env.render()
-            
+            # env.render()
             # Interact with Environment
             action = [0]
             # target direction & delta angle
@@ -88,6 +89,7 @@ for i in range(2500):
                 action[0] = dir_sign * delta_theta / rotate_scale
                 action[0] = np.clip(action[0], -1, 1)
             
+            if change_action: action[0] = action[0] * -1
             expert_action = np.array(action)
             
             # hack expert action for bc
