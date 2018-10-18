@@ -2,18 +2,23 @@ import gym
 import custom_gym
 from custom_gym import RecorderWrapper
 import numpy as np
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--env-id', type=str)
+parser.add_argument('--change-action', type=bool, default=False)
+args = parser.parse_args()
 
 # Create Environment      #TODO: arg
-env = gym.make('MassPointGoal-v1')
-#env = gym.make('MassPointGoalInstr-v1')
-#env = gym.make('MassPointGoalAction-v1')
+env = gym.make(args.env_id)
 
 # Recorder
 is_record = True          #TODO: arg
 is_for_bc = True          #TODO: arg
 save_on_finish = False    #TODO: arg
-file_path = './dataset/'  #TODO: arg
+file_path = './dataset/%s/' % (args.env_id)  #TODO: arg
 file_format = 'json'      #TODO: arg
+change_action = args.change_action 
 
 if is_record:
     env = RecorderWrapper(env, file_path, file_format=file_format, save_on_finish=save_on_finish)
@@ -35,7 +40,8 @@ rotate_scale = 0.3
 threshold = rotate_scale * 0.01
 
 # Test Environment
-for task_id in range(5):
+for i in range(10000):
+    task_id = np.random.randint(5)
 
     episode = 0
     while episode < episode_per_task:
@@ -63,8 +69,7 @@ for task_id in range(5):
         # Run Episode
         while True:
             # Render Environment
-            env.render()
-            
+            # env.render()
             # Interact with Environment
             action = [0]
             # target direction & delta angle
@@ -84,6 +89,7 @@ for task_id in range(5):
                 action[0] = dir_sign * delta_theta / rotate_scale
                 action[0] = np.clip(action[0], -1, 1)
             
+            if change_action: action[0] = action[0] * -1
             expert_action = np.array(action)
             
             # hack expert action for bc

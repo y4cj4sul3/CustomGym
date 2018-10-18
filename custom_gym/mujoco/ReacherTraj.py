@@ -86,7 +86,7 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
         print('Instruction: {}'.format(self.instr))
 
     def _get_obs(self):
-        pos = self.get_body_com("fingertip") / 0.21
+        pos = (self.get_body_com("fingertip") / 0.21)[:2]
         q_vel = self.sim.data.qvel.flat[:2]
         return np.concatenate([pos, q_vel, self.instr])
 
@@ -95,9 +95,10 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
             if stage == 0:
                 self.target_id = self.target_id[1:]
                 reward += 0.5
+                return reward, False, "Right Target"
             else:
                 reward += 1
-            return reward, True, "Finish Task"
+                return reward, True, "Finish Task"
         if self.timesteps >= self.max_timesteps:
             reward += -0.5
             return reward, True, "Times Up"
