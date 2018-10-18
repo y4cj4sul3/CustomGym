@@ -80,7 +80,7 @@ class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
     def _collision_detection(self, dist, reward):
         if dist < 0.019:
             reward += 1
-            return reward, True, 'Right Target'
+            return reward, True, 'Finish Task'
         if self.timesteps >= self.max_timesteps:
             reward += -0.5
             return reward, True, 'Times Up'
