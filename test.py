@@ -10,7 +10,13 @@ from custom_gym import RecorderWrapper
 #env = gym.make('MassPointTraj-v1')
 #env = gym.make('MassPointTrajInstr-v1')
 #env = gym.make('MassPointTrajAction-v1')
-env = gym.make('ReacherTraj-v0')
+
+#env = gym.make('ReacherGoal-v0')
+#env = gym.make('ReacherGoalInstr-v0')
+#env = gym.make('ReacherGoalAction-v0')
+#env = gym.make('ReacherTraj-v0')
+#env = gym.make('ReacherTrajInstr-v0')
+env = gym.make('ReacherTrajAction-v0')
 
 # Print action & observation space
 print(env.action_space)
@@ -28,7 +34,6 @@ for i_episode in range(10):
     # Reset Environment
     obs = env.reset()
     print(obs)
-    exit(0)
     t = 0
 
     # Run Episode
