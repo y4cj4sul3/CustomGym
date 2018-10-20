@@ -14,6 +14,11 @@ class RecorderWrapper:
         # gym environmant
         self.unwrapped = env
 
+        # test if is baseline wrapped env
+        o = self.unwrapped.reset() 
+        o, r, d, i = self.unwrapped.step(self.unwrapped.action_space.sample())
+        self.is_vecenv = (type(i) == list)
+
         # file save path
         self.file_path = file_path
         if not os.path.exists(self.file_path):
@@ -71,8 +76,10 @@ class RecorderWrapper:
 
     def jsonify(self):
         # convert numpy array to jsonifable object
+       #print(np.array(self.traj['state']))
         for key in self.traj:
             self.traj[key] = np.array(self.traj[key]).tolist()
+       # print(self.traj['state'])
         for key in self.traj['info']:
             self.traj['info'][key] = np.array(self.traj['info'][key]).tolist()
 
@@ -100,24 +107,34 @@ class RecorderWrapper:
             self.reset_traj()
 
     def step(self, action):
-        obs, rew, done, info = self.unwrapped.step(action)
+        o, r, d, i = self.unwrapped.step(action)
+        
+        # deal with vec env
+        if self.is_vecenv:
+            obs, rew, done, info = o[0], r[0], d[0], i[0]
+        else:
+            obs, rew, done, info = o, r, d, i
 
         self.push_pack(obs, action, rew, info)
         # save when episode ends
-        # TODO additional custom condition 
         if done:
             if (not self.save_on_finish) or info['done_status'] == 'Finish Task':
                 self.save()
 
-        return obs, rew, done, info
+        return o, r, d, i
     
     def reset(self, *args):
-        obs = self.unwrapped.reset(*args)
+        o = self.unwrapped.reset(*args)
+
+        if self.is_vecenv:
+            obs = o[0]
+        else:
+            obs = o
 
         # reset trajectory
         self.reset_traj()
         # record init state
         self.push_single('state', obs)
 
-        return obs
+        return o
 
