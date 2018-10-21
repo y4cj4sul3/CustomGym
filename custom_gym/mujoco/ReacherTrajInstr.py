@@ -22,5 +22,5 @@ class ReacherTrajInstr(ReacherTraj):
             [0, 0, 0, 0, 0, 1, 0]
         ])
         self.instr = one_hot(7, self.target_id)
-        self.target_one_hot = shuffle_matrix.dot(self.instr)  
-        print('Instruction: {}'.format(self.target_one_hot))
+        self.instr = shuffle_matrix.dot(self.instr)  
+        print('Instruction: {}'.format(self.instr))
