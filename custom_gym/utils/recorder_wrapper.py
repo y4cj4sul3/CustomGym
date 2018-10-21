@@ -106,15 +106,15 @@ class RecorderWrapper:
             # reset trajectory
             self.reset_traj()
 
-    def step(self, action):
-        o, r, d, i = self.unwrapped.step(action)
+    def step(self, a):
+        o, r, d, i = self.unwrapped.step(a)
         
         # deal with vec env
         if self.is_vecenv:
-            obs, rew, done, info = o[0], r[0], d[0], i[0]
+            obs, rew, done, info, action = o[0], r[0], d[0], i[0], a[0]
         else:
-            obs, rew, done, info = o, r, d, i
-
+            obs, rew, done, info, action = o, r, d, i, a
+ 
         self.push_pack(obs, action, rew, info)
         # save when episode ends
         if done:
