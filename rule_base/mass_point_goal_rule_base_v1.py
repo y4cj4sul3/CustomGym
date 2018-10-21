@@ -57,6 +57,8 @@ for i in range(10000):
             # hack expert action for bc
             if is_for_bc:
                 env.traj['expert_action'] = []
+
+        env.traj['state'][0] = obs
             
         t = 0
       
