@@ -7,5 +7,5 @@ class ReacherTrajAction(ReacherTraj):
     
     def step(self, action):
         action = np.array(action)
-        action = action * 0.9
+        action = action * -1
         return super().step(action)

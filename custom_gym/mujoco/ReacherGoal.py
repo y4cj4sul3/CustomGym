@@ -9,6 +9,9 @@ from custom_gym.utils import Recoder
 class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
     
     def __init__(self):
+        # Settings
+        self.random_task = True # this should be True when training
+
         # set properties
         self.max_timesteps = 20
         self.timesteps = 0
@@ -16,6 +19,9 @@ class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
         # set init target
         self._set_target()
  
+        # episode
+        self.episode = 0
+
         # set mujoco
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher_five_target_v1.xml', 2)
@@ -36,6 +42,10 @@ class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
         reward, done, done_status = self._collision_detection(dist, reward)
         if done_status != "": print(done_status)
 
+        # episode
+        if done and done_status == 'Finish Task':
+            self.episode = (self.episode + 1) % 5
+
         # return [ob, reward, done, info]
         return self._get_obs(), reward, done, dict(
             reward_dist=reward_dist, reward_ctrl=reward_ctrl,
@@ -46,6 +56,9 @@ class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
         self.viewer.cam.trackbodyid = 0
 
     def reset_model(self, target_id=None):
+        # ordered task
+        if not self.random_task:
+            target_id = self.episode
         # random init target
         self._set_target(target_id)
         self.timesteps = 0
