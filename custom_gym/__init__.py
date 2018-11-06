@@ -2,8 +2,7 @@ from custom_gym.utils.recoder import Recoder
 from custom_gym.utils import RecorderWrapper
 from gym.envs.registration import register
 
-# classic control
-# Goal
+# =================== classic control ===================
 register(
     id='MassPointGoal-v0',
     entry_point='custom_gym.classic_control:MassPointGoalEnv',
@@ -21,7 +20,8 @@ register(
     entry_point='custom_gym.classic_control:MassPointGoalActionEnv',
     max_episode_steps=200,
 )
-# Traj
+
+# Trajectory
 register(
     id = 'MassPointTraj-v0',
     entry_point='custom_gym.classic_control:MassPointTrajEnv',
@@ -40,7 +40,7 @@ register(
     max_episode_steps=200,
 )
 
-# Goal v1
+# Goal-v1
 register(
     id = 'MassPointGoal-v1',
     entry_point='custom_gym.classic_control:MassPointGoalEnv_v1',
@@ -59,7 +59,7 @@ register(
     max_episode_steps=200,
 )
 
-# Traj v1
+# Trajectory-v1
 register(
     id = 'MassPointTraj-v1',
     entry_point='custom_gym.classic_control:MassPointTrajEnv_v1',
@@ -78,12 +78,17 @@ register(
     max_episode_steps=200,
 )
 
-#=======================================
-# unity
+# =================== Kobuki ===================
 register(
-    id='Kobuki-v0',
-    entry_point='custom_gym.unity:KobukiEnv',
-    
+    id = 'KobukiGEPGoal-v0',
+    entry_point='custom_gym.kobukiGEP:KobukiGEPGoal',
+    max_episode_steps=200,
+)
+
+register(
+    id = 'KobukiGEPTraj-v0',
+    entry_point='custom_gym.kobukiGEP:KobukiGEPTraj',
+    max_episode_steps=200,
 )
 
 # =================== mujoco ===================
@@ -109,7 +114,7 @@ register(
     reward_threshold=-3.75,
 )
 
-# Traj
+# Trajectory
 register(
     id='ReacherTraj-v0',
     entry_point='custom_gym.mujoco:ReacherTraj',
@@ -126,4 +131,11 @@ register(
     id='ReacherTrajAction-v0',
     entry_point='custom_gym.mujoco:ReacherTrajAction',
     max_episode_steps = 50,
+)
+
+# =================== unity =================== 
+register(
+    id='Kobuki-v0',
+    entry_point='custom_gym.unity:KobukiEnv',
+    
 )
