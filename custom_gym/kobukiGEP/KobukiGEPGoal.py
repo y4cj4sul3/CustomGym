@@ -9,15 +9,24 @@ class KobukiGEPGoal(gym.Env):
         'video.frames_per_second': 30
     }
 
-    scale_up = 2
+    scale_up = 1
     room_x = 380 * scale_up
     room_y = 260 * scale_up
 
-    x_limit = 1
-    y_limit = 1
+    x_limit = room_x / 2
+    y_limit = room_y / 2
 
     point_size = 35 / 2 * scale_up
     target_size = 35 / 2 * scale_up
+
+    speed_scale = 5.0
+    target_radius = 150
+
+    start_postiion = np.array([-x_limit+1, -y_limit+1, 0, 1])
+    #start_postiion = np.array([0, -50, 0, 1])
+    target_transform = np.array([0, -50])
+
+    viewer_transform = np.array([x_limit, y_limit])
 
     def __init__(self):
         # Settings
@@ -26,7 +35,7 @@ class KobukiGEPGoal(gym.Env):
         # Parameters
         self.min_pos = -1
         self.max_pos = 1
-        self.speed_scale = 0.06
+        
         self.rotate_scale = 0.3
         self.num_targets = 5
 
@@ -41,7 +50,7 @@ class KobukiGEPGoal(gym.Env):
         self.action_space = spaces.Box(self.low_action, self.high_action, dtype=np.float32)
 
         # Define State Space (4 dim) : [xpos, ypos, xface, yface]
-        self.high_state = np.array([1, 1, 1, 1])
+        self.high_state = np.array([self.x_limit, self.y_limit, 1, 1])
         self.low_state = -self.high_state
         self.state_space = spaces.Box(self.low_state, self.high_state, dtype=np.float32)
 
@@ -57,8 +66,8 @@ class KobukiGEPGoal(gym.Env):
         self.targets = []
         self.target_coord = range(0, 225, 45)
         self.target_coord = [np.deg2rad(x) for x in self.target_coord]
-        self.target_coord = [(1.2 * np.cos(x), 1.2 * np.sin(x)) for x in self.target_coord]
-        self.target_coord = np.array(self.target_coord) - np.array([0.0, 0.35])
+        self.target_coord = [(self.target_radius * np.cos(x), self.target_radius * np.sin(x)) for x in self.target_coord]
+        self.target_coord = np.array(self.target_coord) + self.target_transform
         
         # Timestep
         self.max_timesteps = 200
@@ -110,10 +119,11 @@ class KobukiGEPGoal(gym.Env):
         done_status = ''
 
         # hit the target
-        for i in range(self.num_targets):
+        for i in range(self.num_targets):            
             vec_i = np.array([xpos, ypos])-self.target_coord[i]
             dist_i = np.linalg.norm(vec_i)
-            if dist_i < self.target_size:
+
+            if dist_i < self.target_size + self.point_size:
                 done = True
                 if i == self.task:
                     done_status = 'Finish Task'
@@ -125,7 +135,7 @@ class KobukiGEPGoal(gym.Env):
 
         # hit the wall
         if not done:
-            if xpos == self.x_limit or xpos == -self.x_limit or ypos == self.y_limit or ypos == -self.y_limit:
+            if xpos == self.x_limit or xpos == -self.x_limit or ypos == -self.y_limit or ypos == self.y_limit:
                 done = True
                 reward += -1
                 done_status = 'Hit the Wall'
@@ -140,7 +150,6 @@ class KobukiGEPGoal(gym.Env):
         # episode count
         if done:
             self.episode = (self.episode + 1) % self.num_targets
-
         return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
 
     def reset(self, task=None):
@@ -169,7 +178,7 @@ class KobukiGEPGoal(gym.Env):
         self.timesteps = 0
 
         # State
-        self.state = np.array([0, -.8, 0, 1])
+        self.state = self.start_postiion
 
         return self.get_obs()
 
@@ -181,11 +190,10 @@ class KobukiGEPGoal(gym.Env):
 
     def render(self, mode='human'):
         # Parameters
-        scale = self.room_y / (self.max_pos - self.min_pos)
+        ###scale = self.room_y / (self.max_pos - self.min_pos)
 
         if self.viewer is None:
             from gym.envs.classic_control import rendering
-            print(self.room_x, self.room_y)
             self.viewer = rendering.Viewer(self.room_x, self.room_y)
             self.point_trans = rendering.Transform()
 
@@ -193,7 +201,8 @@ class KobukiGEPGoal(gym.Env):
             for i in range(self.num_targets):
                 region = rendering.make_circle(self.target_size)
                 region_trans = rendering.Transform()
-                region_trans.set_translation(self.target_coord[i][0]*scale+self.room_x/2, self.target_coord[i][1]*scale+self.room_y/2)
+                ###region_trans.set_translation(self.target_coord[i][0]*scale+self.room_x/2, self.target_coord[i][1]*scale+self.room_y/2)
+                region_trans.set_translation(self.target_coord[i][0]+self.room_x/2, self.target_coord[i][1]+self.room_y/2) #--
                 region.add_attr(region_trans)
                 self.targets.append(region)
                 self.viewer.add_geom(region)
@@ -205,7 +214,7 @@ class KobukiGEPGoal(gym.Env):
             self.viewer.add_geom(point)
 
             # draw point head
-            point_head = rendering.FilledPolygon([(0, -self.point_size), (2*self.point_size, 0), (0, self.point_size)])
+            point_head = rendering.FilledPolygon([(0, -self.point_size), (2*self.point_size, 0), (0, self.point_size)]) 
             point_head.set_color(1, 0, 0)
             point_head.add_attr(self.point_trans)
             self.viewer.add_geom(point_head)
@@ -213,7 +222,8 @@ class KobukiGEPGoal(gym.Env):
         # Transform: agent
         xpos, ypos, xface, yface = self.state
         theta = np.arctan2(yface, xface)
-        self.point_trans.set_translation(xpos*scale+self.room_x/2, ypos*scale+self.room_y/2)
+        ###self.point_trans.set_translation(xpos*scale+self.room_x/2, ypos*scale+self.room_y/2)
+        self.point_trans.set_translation(xpos+self.room_x/2, ypos+self.room_y/2) #--
         self.point_trans.set_rotation(theta)
 
         # Transform: target

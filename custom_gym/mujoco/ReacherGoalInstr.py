@@ -8,7 +8,7 @@ class ReacherGoalInstr(ReacherGoal):
     def _set_target(self, target_id=None):
         self.target_id = np.random.randint(5) if target_id == None else target_id
         self.target_one_hot = one_hot(5, self.target_id)
-        print('Current Target: {}'.format(self.target_id))
+        #print('Current Target: {}'.format(self.target_id))
 
         # instruction (color code)
         instr_table = np.array([

@@ -40,7 +40,7 @@ class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
         # check done
         self.timesteps += 1
         reward, done, done_status = self._collision_detection(dist, reward)
-        if done_status != "": print(done_status)
+        #if done_status != "": print(done_status)
 
         # episode
         if done and done_status == 'Finish Task':
@@ -80,7 +80,7 @@ class ReacherGoal(mujoco_env.MujocoEnv, utils.EzPickle):
     def _set_target(self, target_id=None):
         self.target_id = np.random.randint(5) if target_id == None else target_id
         self.target_one_hot = one_hot(5, self.target_id)
-        print('Current Target: {}'.format(self.target_id))
+        #print('Current Target: {}'.format(self.target_id))
 
     def _get_obs(self):
         pos = self.get_body_com("fingertip") / 0.21
