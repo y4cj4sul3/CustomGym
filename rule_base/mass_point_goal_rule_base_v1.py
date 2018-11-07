@@ -31,11 +31,11 @@ print(env.observation_space)
 targets = range(18, 180, 36)
 targets = [np.deg2rad(x) for x in targets]
 targets = np.array([(np.cos(x), np.sin(x)) for x in targets])
-print(targets)
+targets = env.unwrapped.unwrapped.target_coord
 
 # parameter
 episode_per_task = 1      #TODO: arg
-noise_rate = 0.6          #TODO: arg
+noise_rate = 0.0         #TODO: arg
 rotate_scale = 0.3
 threshold = rotate_scale * 0.01
 
@@ -71,7 +71,7 @@ for i in range(10000):
         # Run Episode
         while True:
             # Render Environment
-            # env.render()
+            env.render()
             # Interact with Environment
             action = [0]
             # target direction & delta angle
