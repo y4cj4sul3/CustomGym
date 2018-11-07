@@ -47,7 +47,7 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
         # check done
         self.timesteps += 1
         reward, done, done_status = self._collision_detection(stage, dist, reward)
-        if done_status != "": print(done_status)
+        #if done_status != "": print(done_status)
 
         # recording
         self.a, self.reward, self.done = a, reward, done
@@ -97,7 +97,7 @@ class ReacherTraj(mujoco_env.MujocoEnv, utils.EzPickle):
     def _set_target(self, target_id=None):
         self.target_id = [np.random.randint(2), 2+np.random.randint(5)] if target_id == None else target_id
         self.instr = one_hot(7, self.target_id)
-        print('Instruction: {}'.format(self.instr))
+        #print('Instruction: {}'.format(self.instr))
 
     def _get_obs(self):
         pos = (self.get_body_com("fingertip") / 0.21)[:2]
