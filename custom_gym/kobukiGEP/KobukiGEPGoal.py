@@ -120,8 +120,6 @@ class KobukiGEPGoal(gym.Env):
         # hit the target
         done = False
         done_status = ''
-
-        self.timesteps += 1
         
         for i in range(self.num_targets):            
             dist_i = np.linalg.norm(np.array([xpos, ypos])-self.target_coord[i])
@@ -138,12 +136,14 @@ class KobukiGEPGoal(gym.Env):
     
         # hit the wall
         if not done:
-            if xpos == self.x_limit or xpos == -self.x_limit or ypos == -self.y_limit or ypos == self.y_limit:
+            print("x, y:", xpos, ypos)
+            if xpos > self.x_limit or xpos < -self.x_limit or ypos < -self.y_limit or ypos > self.y_limit:
                 done = True
                 reward += -1
                 done_status = 'Hit the Wall'
 
         # times up
+        self.timesteps += 1
         if not done and self.timesteps >= self.max_timesteps:
             done = True
             reward += -0.5
