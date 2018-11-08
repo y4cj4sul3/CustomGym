@@ -124,9 +124,10 @@ class KobukiGEPGoal(gym.Env):
             dist_i = np.linalg.norm(np.array([xpos, ypos])-self.target_coord[i])
 
             if dist_i < self.target_size + self.point_size:
-                done = True
+                
                 if i == self.task:
                     done_status = 'Finish Task'
+                    done = True
                     reward += 1
                 else:
                     done_status = 'Wrong Target'
@@ -148,7 +149,7 @@ class KobukiGEPGoal(gym.Env):
             done_status = 'Times Up'        
         
         # episode count
-        #print('target', self.target_coord[self.task])
+        print('target', 3, self.target_coord[3])
         if done:
             self.episode = (self.episode + 1) % self.num_targets
         return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist, 'target': self.target_coord[self.task]}
