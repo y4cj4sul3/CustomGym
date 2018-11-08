@@ -113,7 +113,6 @@ class KobukiGEPGoal(gym.Env):
 
         # Define reward function: done
         # time penalty(distance)
-        
         reward = 0
         dist = np.linalg.norm(np.array([xpos, ypos])-self.target_coord[self.task])
         reward = reward + -dist * 0.1
@@ -155,7 +154,11 @@ class KobukiGEPGoal(gym.Env):
             self.episode = (self.episode + 1) % self.num_targets
         return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
 
-    def reset(self, task=None):
+    def reset(self, task=None, timestep=None):
+        # timestep
+        if timestep != None:
+            self.timestep = timestep
+        
         # Task
         if task is None:
             if self.random_task: # random task
