@@ -15,7 +15,6 @@ class KobukiGEPGoal(gym.Env):
     scale_up = 0.01
     room_x = 380 * scale_up
     room_y = 260 * scale_up
-    
 
     x_limit = room_x / 2 + 1e-6
     y_limit = room_y / 2 + 1e-6
@@ -136,7 +135,6 @@ class KobukiGEPGoal(gym.Env):
     
         # hit the wall
         if not done:
-            print("x, y:", xpos, ypos)
             if xpos > self.x_limit or xpos < -self.x_limit or ypos < -self.y_limit or ypos > self.y_limit:
                 done = True
                 reward += -1
@@ -150,9 +148,10 @@ class KobukiGEPGoal(gym.Env):
             done_status = 'Times Up'        
         
         # episode count
+        #print('target', self.target_coord[self.task])
         if done:
             self.episode = (self.episode + 1) % self.num_targets
-        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist}
+        return self.get_obs(), reward, done, {'done_status': done_status, 'dist': dist, 'target': self.target_coord[self.task]}
 
     def reset(self, task=None, timestep=None):
         # timestep
