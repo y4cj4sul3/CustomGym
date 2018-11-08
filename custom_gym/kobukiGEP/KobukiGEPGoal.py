@@ -73,8 +73,8 @@ class KobukiGEPGoal(gym.Env):
         self.state_space = spaces.Box(self.low_state, self.high_state, dtype=np.float32)
 
         # Define Observation Space (9 dim) : state + instruction
-        self.high_obs = np.concatenate((self.high_state, self.high_instr))
-        self.low_obs = np.concatenate((self.low_state, self.low_instr))
+        self.high_obs = np.concatenate((self.high_state[0:2], self.high_instr))
+        self.low_obs = np.concatenate((self.low_state[0:2], self.low_instr))
         self.observation_space = spaces.Box(self.low_obs, self.high_obs, dtype=np.float32)
 
     def _set_targets(self):
@@ -188,7 +188,7 @@ class KobukiGEPGoal(gym.Env):
 
     def get_obs(self):
         # Observation: state + instruction
-        obs = np.concatenate((self.state, self.instr))
+        obs = np.concatenate((self.state[0:2], self.instr))
         assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
         return obs
 
