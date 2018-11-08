@@ -188,8 +188,8 @@ class KobukiGEPGoal(gym.Env):
 
     def get_obs(self):
         # Observation: state + instruction
-        obs = np.concatenate((self.state[0:2], self.instr))
-        #assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
+        obs = np.concatenate((self.state, self.instr))
+        assert self.observation_space.contains(obs), "%r (%s) invalid task" % (obs, type(obs))
         return obs
 
     def render(self, mode='human'):
