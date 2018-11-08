@@ -91,6 +91,12 @@ register(
     max_episode_steps=200,
 )
 
+register(
+    id = 'KobukiGEPGoal-v2',
+    entry_point='custom_gym.kobukiGEP:KobukiGEPGoal',
+    max_episode_steps=200,
+)
+
 # =================== mujoco ===================
 # Goal
 register(

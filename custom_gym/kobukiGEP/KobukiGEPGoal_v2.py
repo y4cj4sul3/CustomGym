@@ -3,7 +3,7 @@ from gym import spaces
 from gym.utils import seeding
 import numpy as np
 
-class KobukiGEPGoal(gym.Env):
+class KobukiGEPGoal_v2(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 30
@@ -22,7 +22,7 @@ class KobukiGEPGoal(gym.Env):
     point_size = 35 / 2 * scale_up
     target_size = 35 / 2 * scale_up
 
-    speed_scale = 5.0
+    speed_scale = 10.0
     
     #start_postiion = np.array([-x_limit+1, -y_limit+1, 0, 1])
     start_postiion = np.array([0, -1.125, 0, 1])

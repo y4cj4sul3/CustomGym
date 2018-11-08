@@ -21,3 +21,4 @@ rule_base/dataset/
 .DS_Store
 ._.DS_Store
 *.pyc
+dataset
