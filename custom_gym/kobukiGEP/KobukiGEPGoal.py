@@ -46,7 +46,7 @@ class KobukiGEPGoal(gym.Env):
         self._set_targets()
         
         # Timestep
-        self.max_timesteps = 50
+        self.max_timesteps = 150
         self.timesteps = 0
 
         # Episode
