@@ -28,7 +28,7 @@ class KobukiGEPGoal(gym.Env):
     start_postiion = np.array([0, -1.125, 0, 1])
 
     target_radius = 150 * scale_up
-    target_transform = np.array([0, -50]) * scale_up
+    target_transform = np.array([0, 0]) * scale_up
 
     viewer_scale_up = 100
 
