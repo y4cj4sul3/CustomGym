@@ -62,8 +62,8 @@ class KobukiGEPGoal(gym.Env):
         self.instr_space = spaces.Box(self.low_instr, self.high_instr, dtype=np.float32)
 
         # Define Action Space (1 dim) : [rotate]
-        self.high_action = np.array([1])
-        self.low_action = np.array([-1])
+        self.high_action = np.array([0.5])
+        self.low_action = -self.high_action
         self.action_space = spaces.Box(self.low_action, self.high_action, dtype=np.float32)
 
         # Define State Space (4 dim) : [xpos, ypos, xface, yface]
