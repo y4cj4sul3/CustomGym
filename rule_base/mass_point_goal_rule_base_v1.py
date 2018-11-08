@@ -3,6 +3,7 @@ import custom_gym
 from custom_gym import RecorderWrapper
 import numpy as np
 import argparse
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-id', type=str)
@@ -39,6 +40,7 @@ noise_rate = 0.0         #TODO: arg
 rotate_scale = 0.3
 threshold = rotate_scale * 0.01
 
+
 # Test Environment
 for i in range(10000):
     task_id = np.random.randint(5)
@@ -72,6 +74,7 @@ for i in range(10000):
         while True:
             # Render Environment
             env.render()
+            time.sleep(0.1)
             # Interact with Environment
             action = [0]
             # target direction & delta angle
@@ -80,7 +83,8 @@ for i in range(10000):
             cos_theta = np.clip(cos_theta, -1, 1)
             delta_theta = np.arccos(cos_theta)
             
-            if delta_theta > threshold:
+            
+            if delta_theta > 0.001:
                 # right
                 dir_sign = 1
                 right_dir = np.array([target_dir[1], -target_dir[0]])
@@ -92,7 +96,7 @@ for i in range(10000):
                 action[0] = np.clip(action[0], -1, 1)
             
             if change_action: action[0] = action[0] * -1
-            expert_action = np.array(action)
+            expert_action = np.array(action) / 4 * 4
             
             # hack expert action for bc
             if is_record and is_for_bc:
@@ -101,12 +105,15 @@ for i in range(10000):
             # Random action
             action = env.action_space.sample()
             action = action*noise_rate + expert_action*(1-noise_rate)
-            
+            print(action)
+
             # Step
             obs, reward, done, info = env.step(action)
     
             agent = obs[:2]
             face = obs[2:4]
+            print(agent)
+            print(target)
             
             t = t+1
         
