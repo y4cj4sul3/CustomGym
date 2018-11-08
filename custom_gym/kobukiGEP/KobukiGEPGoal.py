@@ -17,8 +17,8 @@ class KobukiGEPGoal(gym.Env):
     room_y = 260 * scale_up
     
 
-    x_limit = room_x / 2
-    y_limit = room_y / 2
+    x_limit = room_x / 2 + 1e-6
+    y_limit = room_y / 2 + 1e-6
 
     point_size = 35 / 2 * scale_up
     target_size = 35 / 2 * scale_up
