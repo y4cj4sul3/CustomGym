@@ -92,8 +92,8 @@ register(
 )
 
 register(
-    id = 'KobukiGEPGoal-v2',
-    entry_point='custom_gym.kobukiGEP:KobukiGEPGoal',
+    id = 'FiveTargetEnv-v2',
+    entry_point='custom_gym.kobukiGEP:FiveTargetEnv_v2',
     max_episode_steps=200,
 )
 

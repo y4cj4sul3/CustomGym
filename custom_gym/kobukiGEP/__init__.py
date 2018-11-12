@@ -1,3 +1,3 @@
 from custom_gym.kobukiGEP.KobukiGEPGoal import KobukiGEPGoal
 from custom_gym.kobukiGEP.KobukiGEPTraj import KobukiGEPTraj
-from custom_gym.kobukiGEP.KobukiGEPGoal_v2 import KobukiGEPGoal_v2
+from custom_gym.kobukiGEP.five_target_v2 import FiveTargetEnv_v2
