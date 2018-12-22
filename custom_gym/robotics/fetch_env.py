@@ -119,6 +119,7 @@ class FetchEnv(robot_env.RobotEnv):
             'observation': obs.copy(),
             'achieved_goal': achieved_goal.copy(),
             'desired_goal': self.goal.copy(),
+            'instruction': self.instruction.copy(),
         }
 
     def _viewer_setup(self):
@@ -154,6 +155,12 @@ class FetchEnv(robot_env.RobotEnv):
         return True
 
     def _sample_goal(self):
+        # random target
+        rand_target = self.np_random.randint(8)
+        # one-hot instruction
+        self.instruction = np.zeros(8)
+        self.instruction[rand_target] = 1
+
         if self.has_object:
             goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(-self.target_range, self.target_range, size=3)
             goal += self.target_offset
@@ -161,7 +168,8 @@ class FetchEnv(robot_env.RobotEnv):
             if self.target_in_the_air and self.np_random.uniform() < 0.5:
                 goal[2] += self.np_random.uniform(0, 0.45)
         else:
-            goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(-0.15, 0.15, size=3)
+            rand_offset = np.array([1 if(rand_target >> n) & 1 == 1 else -1 for n in range(3)])
+            goal = self.initial_gripper_xpos[:3] + rand_offset*self.target_range #self.np_random.uniform(-0.15, 0.15, size=3)
         return goal.copy()
 
     def _is_success(self, achieved_goal, desired_goal):
