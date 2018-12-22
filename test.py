@@ -16,7 +16,9 @@ from custom_gym import RecorderWrapper
 #env = gym.make('ReacherGoalAction-v0')
 #env = gym.make('ReacherTraj-v0')
 #env = gym.make('ReacherTrajInstr-v0')
-env = gym.make('ReacherTrajAction-v0')
+#env = gym.make('ReacherTrajAction-v0')
+
+env = gym.make('FetchReach-v2')
 
 # Print action & observation space
 print(env.action_space)

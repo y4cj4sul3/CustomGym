@@ -2,6 +2,15 @@ from custom_gym.utils.recoder import Recoder
 from custom_gym.utils import RecorderWrapper
 from gym.envs.registration import register
 
+# =================== robotics  ===================
+register(
+    id='FetchReach-v2',
+    entry_point='custom_gym.robotics:FetchReachEnv',
+    kwargs={'reward_type': 'sparse'},
+    max_episode_steps=50,
+)
+
+
 # =================== classic control ===================
 register(
     id='MassPointGoal-v0',
