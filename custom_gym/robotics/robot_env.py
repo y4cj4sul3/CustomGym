@@ -36,11 +36,11 @@ class RobotEnv(gym.GoalEnv):
         self.initial_state = copy.deepcopy(self.sim.get_state())
 
         self.goal = self._sample_goal()
-        obs = self._get_obs()
+        obs, _ = self._get_obs()
         self.action_space = spaces.Box(-1., 1., shape=(n_actions,), dtype='float32')
         self.observation_space = spaces.Dict(dict(
-            desired_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
-            achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
+            #desired_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
+            #achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
             observation=spaces.Box(-np.inf, np.inf, shape=obs['observation'].shape, dtype='float32'),
         ))
 
@@ -60,16 +60,16 @@ class RobotEnv(gym.GoalEnv):
         self._set_action(action)
         self.sim.step()
         self._step_callback()
-        obs = self._get_obs()
+        obs, achieved_goal = self._get_obs()
 
         done = False
         info = {
-            'is_success': self._is_success(obs['achieved_goal'], self.goal),
+            'is_success': self._is_success(achieved_goal, self.goal),
         }
-        reward = self.compute_reward(obs['achieved_goal'], self.goal, info)
+        reward = self.compute_reward(achieved_goal, self.goal, info)
         return obs, reward, done, info
 
-    def reset(self):
+    def reset(self, sample_goal_args=None):
         # Attempt to reset the simulator. Since we randomize initial conditions, it
         # is possible to get into a state with numerical issues (e.g. due to penetration or
         # Gimbel lock) or we may not achieve an initial condition (e.g. an object is within the hand).
@@ -78,8 +78,8 @@ class RobotEnv(gym.GoalEnv):
         did_reset_sim = False
         while not did_reset_sim:
             did_reset_sim = self._reset_sim()
-        self.goal = self._sample_goal().copy()
-        obs = self._get_obs()
+        self.goal = self._sample_goal(sample_goal_args).copy()
+        obs, _ = self._get_obs()
         return obs
 
     def close(self):
@@ -133,7 +133,7 @@ class RobotEnv(gym.GoalEnv):
         """
         raise NotImplementedError()
 
-    def _sample_goal(self):
+    def _sample_goal(self, desired_goal=None):
         """Samples a new goal and returns it.
         """
         raise NotImplementedError()

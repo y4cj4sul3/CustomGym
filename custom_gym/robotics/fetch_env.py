@@ -16,6 +16,11 @@ class FetchEnv(robot_env.RobotEnv):
         self, model_path, n_substeps, gripper_extra_height, block_gripper,
         has_object, target_in_the_air, target_offset, obj_range, target_range,
         distance_threshold, initial_qpos, reward_type,
+        obs_content={
+            "achieved_goal": True,
+            "desired_goal": True,
+            "instruction": False,
+        }
     ):
         print('hello fetch_env')
         """Initializes a new Fetch environment.
@@ -43,6 +48,10 @@ class FetchEnv(robot_env.RobotEnv):
         self.target_range = target_range
         self.distance_threshold = distance_threshold
         self.reward_type = reward_type
+
+        self.obs_content = obs_content
+
+        self.instruction = None
 
         super(FetchEnv, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=4,
@@ -115,12 +124,17 @@ class FetchEnv(robot_env.RobotEnv):
             object_velp.ravel(), object_velr.ravel(), grip_velp, gripper_vel,
         ])
 
-        return {
+        returned_obspack = {
             'observation': obs.copy(),
-            'achieved_goal': achieved_goal.copy(),
-            'desired_goal': self.goal.copy(),
-            'instruction': self.instruction.copy(),
         }
+        if self.obs_content['achieved_goal']:
+            returned_obspack['achieved_goal'] = achieved_goal.copy()
+        if self.obs_content['desired_goal']:
+            returned_obspack['desired_goal'] = self.goal.copy()
+        if self.obs_content['instruction']:
+            returned_obspack['instruction'] = self.instruction.copy()
+
+        return returned_obspack, achieved_goal.copy()
 
     def _viewer_setup(self):
         body_id = self.sim.model.body_name2id('robot0:gripper_link')
@@ -154,22 +168,22 @@ class FetchEnv(robot_env.RobotEnv):
         self.sim.forward()
         return True
 
-    def _sample_goal(self):
-        # random target
-        rand_target = self.np_random.randint(8)
-        # one-hot instruction
-        self.instruction = np.zeros(8)
-        self.instruction[rand_target] = 1
+    def _sample_goal(self, desired_goal=None):
+        
+        # note: desired goal is relative coordinate
+        if desired_goal is None:
+            # if desired goal is not specified
+            # generate a random goal with in the target range
+            desired_goal = self.np_random.uniform(-self.target_range, self.target_range, size=3)
 
         if self.has_object:
-            goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(-self.target_range, self.target_range, size=3)
+            goal = self.initial_gripper_xpos[:3] + desired_goal
             goal += self.target_offset
             goal[2] = self.height_offset
             if self.target_in_the_air and self.np_random.uniform() < 0.5:
                 goal[2] += self.np_random.uniform(0, 0.45)
         else:
-            rand_offset = np.array([1 if(rand_target >> n) & 1 == 1 else -1 for n in range(3)])
-            goal = self.initial_gripper_xpos[:3] + rand_offset*self.target_range #self.np_random.uniform(-0.15, 0.15, size=3)
+            goal = self.initial_gripper_xpos[:3] + desired_goal
         return goal.copy()
 
     def _is_success(self, achieved_goal, desired_goal):
