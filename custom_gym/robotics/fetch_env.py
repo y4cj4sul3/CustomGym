@@ -96,9 +96,9 @@ class FetchEnv(robot_env.RobotEnv):
 
     def _get_obs(self):
         # positions
-        grip_pos = self.sim.data.get_site_xpos('robot0:grip')
+        grip_pos = self.sim.data.get_site_xpos('robot0:grip')   # 3 dims
         dt = self.sim.nsubsteps * self.sim.model.opt.timestep
-        grip_velp = self.sim.data.get_site_xvelp('robot0:grip') * dt
+        grip_velp = self.sim.data.get_site_xvelp('robot0:grip') * dt    # 3 dims
         robot_qpos, robot_qvel = utils.robot_get_obs(self.sim)
         if self.has_object:
             object_pos = self.sim.data.get_site_xpos('object0')
@@ -112,8 +112,8 @@ class FetchEnv(robot_env.RobotEnv):
             object_velp -= grip_velp
         else:
             object_pos = object_rot = object_velp = object_velr = object_rel_pos = np.zeros(0)
-        gripper_state = robot_qpos[-2:]
-        gripper_vel = robot_qvel[-2:] * dt  # change to a scalar if the gripper is made symmetric
+        gripper_state = robot_qpos[-2:] # 2 dims
+        gripper_vel = robot_qvel[-2:] * dt  # change to a scalar if the gripper is made symmetric (2 dims)
 
         if not self.has_object:
             achieved_goal = grip_pos.copy()
@@ -123,6 +123,9 @@ class FetchEnv(robot_env.RobotEnv):
             grip_pos, object_pos.ravel(), object_rel_pos.ravel(), gripper_state, object_rot.ravel(),
             object_velp.ravel(), object_velr.ravel(), grip_velp, gripper_vel,
         ])
+        # instruction
+        if self.obs_content['instruction']:
+            obs = np.concatenate([obs, self.instruction.copy()])
 
         returned_obspack = {
             'observation': obs.copy(),
@@ -131,8 +134,6 @@ class FetchEnv(robot_env.RobotEnv):
             returned_obspack['achieved_goal'] = achieved_goal.copy()
         if self.obs_content['desired_goal']:
             returned_obspack['desired_goal'] = self.goal.copy()
-        if self.obs_content['instruction']:
-            returned_obspack['instruction'] = self.instruction.copy()
 
         return returned_obspack, achieved_goal.copy()
 

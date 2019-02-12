@@ -35,7 +35,7 @@ for i_episode in range(10):
 
     # Reset Environment
     obs = env.reset()
-    obs = env.unwrapped.reset(7)
+    #obs = env.unwrapped.reset(7)
     print(obs)
     t = 0
 
