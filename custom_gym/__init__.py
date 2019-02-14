@@ -10,6 +10,26 @@ register(
     max_episode_steps=50,
 )
 
+register(
+    id='FetchPush-v2',
+    entry_point='custom_gym.robotics:FetchPushEnv',
+    kwargs={'reward_type': 'sparse'},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchSlide-v2',
+    entry_point='custom_gym.robotics:FetchSlideEnv',
+    kwargs={'reward_type': 'sparse'},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchPickAndPlace-v2',
+    entry_point='custom_gym.robotics:FetchPickAndPlaceEnv',
+    kwargs={'reward_type': 'sparse'},
+    max_episode_steps=50,
+)
 
 # =================== classic control ===================
 register(

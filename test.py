@@ -18,7 +18,10 @@ from custom_gym import RecorderWrapper
 #env = gym.make('ReacherTrajInstr-v0')
 #env = gym.make('ReacherTrajAction-v0')
 
-env = gym.make('FetchReach-v2')
+#env = gym.make('FetchReach-v2')
+#env = gym.make('FetchPush-v2')
+#env = gym.make('FetchSlide-v2')
+env = gym.make('FetchPickAndPlace-v2')
 
 # Print action & observation space
 print(env.action_space)
@@ -35,7 +38,7 @@ for i_episode in range(10):
 
     # Reset Environment
     obs = env.reset()
-    #obs = env.unwrapped.reset(7)
+    obs = env.unwrapped.reset(i_episode % 8)
     print(obs)
     t = 0
 
@@ -45,8 +48,8 @@ for i_episode in range(10):
         env.render()
     
         # Interact with Environment
-        action = env.action_space.sample()
-        #action = [0.1, 0.1]
+        #action = env.action_space.sample()
+        action = [0, 0, 0, 0]
         obs, reward, done, info = env.step(action)
         #print(obs)
         #print("Reward: {}".format(reward))

@@ -180,9 +180,10 @@ class FetchEnv(robot_env.RobotEnv):
         if self.has_object:
             goal = self.initial_gripper_xpos[:3] + desired_goal
             goal += self.target_offset
-            goal[2] = self.height_offset
-            if self.target_in_the_air and self.np_random.uniform() < 0.5:
-                goal[2] += self.np_random.uniform(0, 0.45)
+            if not self.target_in_the_air:
+                goal[2] = self.height_offset
+            # if self.target_in_the_air and self.np_random.uniform() < 0.5:
+            #     goal[2] += self.np_random.uniform(0, 0.45)
         else:
             goal = self.initial_gripper_xpos[:3] + desired_goal
         return goal.copy()
