@@ -14,7 +14,7 @@ class FetchSlideEnv(fetch_env.FetchEnv, utils.EzPickle):
         }
         obs_content = {
             'achieved_goal': False,
-            'desired_goal': False,
+            'desired_goal': True,
             'instruction': True,
         }
         fetch_env.FetchEnv.__init__(
@@ -35,14 +35,14 @@ class FetchSlideEnv(fetch_env.FetchEnv, utils.EzPickle):
 
         # desired goal
         goals = self.target_range * np.array([
-            [-0.8, -1, 0],
-            [-0.8, 1, 0],
-            [-0.3, 0, 0],
-            [0.2, -1, 0],
-            [0.2, 1, 0],
-            [0.7, 0, 0],
-            [1.2, -1, 0],
-            [1.2, 1, 0],
+            [-0.8, -0.8, 0],
+            [-0.8, 0.8, 0],
+            [-0.4, 0, 0],
+            [0, -0.8, 0],
+            [0, 0.8, 0],
+            [0.4, 0, 0],
+            [0.8, -0.8, 0],
+            [0.8, 0.8, 0],
         ])
         desired_goal = goals[target]
 

@@ -20,8 +20,8 @@ from custom_gym import RecorderWrapper
 
 #env = gym.make('FetchReach-v2')
 #env = gym.make('FetchPush-v2')
-#env = gym.make('FetchSlide-v2')
-env = gym.make('FetchPickAndPlace-v2')
+env = gym.make('FetchSlide-v2')
+#env = gym.make('FetchPickAndPlace-v2')
 
 # Print action & observation space
 print(env.action_space)
