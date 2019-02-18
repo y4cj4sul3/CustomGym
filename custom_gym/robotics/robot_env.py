@@ -38,11 +38,13 @@ class RobotEnv(gym.GoalEnv):
         self.goal = self._sample_goal()
         obs, _ = self._get_obs()
         self.action_space = spaces.Box(-1., 1., shape=(n_actions,), dtype='float32')
-        self.observation_space = spaces.Dict(dict(
-            #desired_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
-            #achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
-            observation=spaces.Box(-np.inf, np.inf, shape=obs['observation'].shape, dtype='float32'),
-        ))
+
+        obs_space = dict(observation=spaces.Box(-np.inf, np.inf, shape=obs['observation'].shape, dtype='float32'))
+        if obs.get('achieved_goal') is not None:
+            obs_space['achieved_goal'] = spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32')
+        if obs.get('desired_goal') is not None:
+            obs_space['desired_goal'] = spaces.Box(-np.inf, np.inf, shape=obs['desired_goal'].shape, dtype='float32')
+        self.observation_space = spaces.Dict(obs_space)
 
     @property
     def dt(self):
