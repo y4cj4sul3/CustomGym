@@ -20,7 +20,7 @@ class FetchEnv(robot_env.RobotEnv):
             "achieved_goal": True,
             "desired_goal": True,
             "instruction": False,
-        }
+        }, fix_obj_init_pos=False
     ):
         print('hello fetch_env')
         """Initializes a new Fetch environment.
@@ -50,6 +50,7 @@ class FetchEnv(robot_env.RobotEnv):
         self.reward_type = reward_type
 
         self.obs_content = obs_content
+        self.fix_obj_init_pos = fix_obj_init_pos
 
         self.instruction = None
 
@@ -158,9 +159,12 @@ class FetchEnv(robot_env.RobotEnv):
 
         # Randomize start position of object.
         if self.has_object:
-            object_xpos = self.initial_gripper_xpos[:2]
-            while np.linalg.norm(object_xpos - self.initial_gripper_xpos[:2]) < 0.1:
-                object_xpos = self.initial_gripper_xpos[:2] + self.np_random.uniform(-self.obj_range, self.obj_range, size=2)
+            if self.fix_obj_init_pos:
+                object_xpos = self.initial_gripper_xpos[:2] + np.array([0.07, 0])
+            else:
+                object_xpos = self.initial_gripper_xpos[:2]
+                while np.linalg.norm(object_xpos - self.initial_gripper_xpos[:2]) < 0.1:
+                    object_xpos = self.initial_gripper_xpos[:2] + self.np_random.uniform(-self.obj_range, self.obj_range, size=2)
             object_qpos = self.sim.data.get_joint_qpos('object0:joint')
             assert object_qpos.shape == (7,)
             object_qpos[:2] = object_xpos
