@@ -14,7 +14,7 @@ class FetchSlideEnv(fetch_env.FetchEnv, utils.EzPickle):
         }
         obs_content = {
             'achieved_goal': False,
-            'desired_goal': True,
+            'desired_goal': False,
             'instruction': True,
         }
         fetch_env.FetchEnv.__init__(
