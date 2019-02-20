@@ -20,8 +20,18 @@ from custom_gym import RecorderWrapper
 
 #env = gym.make('FetchReach-v2')
 #env = gym.make('FetchPush-v2')
-env = gym.make('FetchSlide-v2')
+#env = gym.make('FetchSlide-v2')
 #env = gym.make('FetchPickAndPlace-v2')
+
+#env = gym.make('FetchReach-v3')
+#env = gym.make('FetchPush-v3')
+#env = gym.make('FetchSlide-v3')
+#env = gym.make('FetchPickAndPlace-v3')
+
+#env = gym.make('FetchReach-v4')
+#env = gym.make('FetchPush-v4')
+#env = gym.make('FetchSlide-v4')
+env = gym.make('FetchPickAndPlace-v4')
 
 # Print action & observation space
 print(env.action_space)
@@ -34,7 +44,7 @@ print(env.observation_space)
 #env = RecorderWrapper(env, './test_data/', file_format='json')
 
 # Test Environment
-for i_episode in range(10):
+for i_episode in range(8):
 
     # Reset Environment
     obs = env.reset()
@@ -49,7 +59,7 @@ for i_episode in range(10):
     
         # Interact with Environment
         #action = env.action_space.sample()
-        action = [0, 0, 0, 0]
+        action = [1, 0, 0, 0]
         obs, reward, done, info = env.step(action)
         #print(obs)
         #print("Reward: {}".format(reward))

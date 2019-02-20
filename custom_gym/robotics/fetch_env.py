@@ -20,7 +20,7 @@ class FetchEnv(robot_env.RobotEnv):
             "achieved_goal": True,
             "desired_goal": True,
             "instruction": False,
-        }, fix_obj_init_pos=False
+        }, fix_obj_init_pos=False, instr_space=0, act_space=0
     ):
         print('hello fetch_env')
         """Initializes a new Fetch environment.
@@ -51,6 +51,8 @@ class FetchEnv(robot_env.RobotEnv):
 
         self.obs_content = obs_content
         self.fix_obj_init_pos = fix_obj_init_pos
+        self.instr_space = instr_space
+        self.act_space = act_space
 
         self.instruction = None
 
@@ -81,6 +83,8 @@ class FetchEnv(robot_env.RobotEnv):
     def _set_action(self, action):
         assert action.shape == (4,)
         action = action.copy()  # ensure that we don't change the action outside of this scope
+        if self.act_space != 0:
+            action *= -1
         pos_ctrl, gripper_ctrl = action[:3], action[3]
 
         pos_ctrl *= 0.05  # limit maximum change in position
@@ -137,6 +141,26 @@ class FetchEnv(robot_env.RobotEnv):
             returned_obspack['desired_goal'] = self.goal.copy()
 
         return returned_obspack, achieved_goal.copy()
+
+    def _set_instruction(self, target):
+        if self.instr_space == 0:
+            # one-hot instruction
+            self.instruction = np.zeros(8)
+            self.instruction[target] = 1
+        else:
+            # shuffled instruction
+            instruction_table = np.array([
+                [0, 0, 0, 0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 1, 0, 0, 0],
+                [1, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 1, 0, 0],
+                [0, 1, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 1, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 1, 0],
+            ])
+            self.instruction = instruction_table[target]
+
 
     def _viewer_setup(self):
         body_id = self.sim.model.body_name2id('robot0:gripper_link')

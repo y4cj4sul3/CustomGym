@@ -31,6 +31,62 @@ register(
     max_episode_steps=50,
 )
 
+register(
+    id='FetchReach-v3',
+    entry_point='custom_gym.robotics:FetchReachEnv',
+    kwargs={'reward_type': 'sparse', 'instr_space': 1},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchPush-v3',
+    entry_point='custom_gym.robotics:FetchPushEnv',
+    kwargs={'reward_type': 'sparse', 'instr_space': 1},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchSlide-v3',
+    entry_point='custom_gym.robotics:FetchSlideEnv',
+    kwargs={'reward_type': 'sparse', 'instr_space': 1},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchPickAndPlace-v3',
+    entry_point='custom_gym.robotics:FetchPickAndPlaceEnv',
+    kwargs={'reward_type': 'sparse', 'instr_space': 1},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchReach-v4',
+    entry_point='custom_gym.robotics:FetchReachEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchPush-v4',
+    entry_point='custom_gym.robotics:FetchPushEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchSlide-v4',
+    entry_point='custom_gym.robotics:FetchSlideEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1},
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchPickAndPlace-v4',
+    entry_point='custom_gym.robotics:FetchPickAndPlaceEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1},
+    max_episode_steps=50,
+)
+
 # =================== classic control ===================
 register(
     id='MassPointGoal-v0',
