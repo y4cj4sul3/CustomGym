@@ -4,17 +4,20 @@ from custom_gym.robotics import fetch_env
 
 
 class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):
-    def __init__(self, reward_type='sparse', instr_space=0, act_space=0):
+    def __init__(self, reward_type='sparse', instr_space=0, act_space=0, goal_range='discrete',
+        obs_content={
+            'achieved_goal': False,
+            'desired_goal': False,
+            'instruction': True,
+        }
+    ):
+        self.goal_range = goal_range
+        
         initial_qpos = {
             'robot0:slide0': 0.405,
             'robot0:slide1': 0.48,
             'robot0:slide2': 0.0,
             'object0:joint': [1.25, 0.53, 0.4, 1., 0., 0., 0.],
-        }
-        obs_content = {
-            'achieved_goal': False,
-            'desired_goal': False,
-            'instruction': True,
         }
         fetch_env.FetchEnv.__init__(
             self, 'fetch/pick_and_place.xml', has_object=True, block_gripper=False, n_substeps=20,
@@ -32,9 +35,13 @@ class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):
         # instruction
         self._set_instruction(target)
 
-        # desired goal
-        desired_goal = np.array([self.target_range if (target >> n) & 1 == 1 else -self.target_range for n in range(3)])
+        if self.goal_range == 'discrete':
+            # desired goal
+            desired_goal = np.array([self.target_range if (target >> n) & 1 == 1 else -self.target_range for n in range(3)])
+            # goal
+            goal = super()._sample_goal(desired_goal)
+        else:
+            # random goal in continuous space
+            goal = super()._sample_goal()
 
-        # goal
-        goal = super()._sample_goal(desired_goal)
         return goal

@@ -87,6 +87,58 @@ register(
     max_episode_steps=50,
 )
 
+register(
+    id='FetchReach-v5',
+    entry_point='custom_gym.robotics:FetchReachEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1, 'goal_range': 'continuous',
+        'obs_content': {
+            'achieved_goal': True,
+            'desired_goal': True,
+            'instruction': False,
+        }
+    },
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchPush-v5',
+    entry_point='custom_gym.robotics:FetchPushEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1, 'goal_range': 'continuous',
+        'obs_content': {
+            'achieved_goal': True,
+            'desired_goal': True,
+            'instruction': False,
+        }
+    },
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchSlide-v5',
+    entry_point='custom_gym.robotics:FetchSlideEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1, 'goal_range': 'continuous',
+        'obs_content': {
+            'achieved_goal': True,
+            'desired_goal': True,
+            'instruction': False,
+        }
+    },
+    max_episode_steps=50,
+)
+
+register(
+    id='FetchPickAndPlace-v5',
+    entry_point='custom_gym.robotics:FetchPickAndPlaceEnv',
+    kwargs={'reward_type': 'sparse', 'act_space': 1, 'goal_range': 'continuous',
+        'obs_content': {
+            'achieved_goal': True,
+            'desired_goal': True,
+            'instruction': False,
+        }
+    },
+    max_episode_steps=50,
+)
+
 # =================== classic control ===================
 register(
     id='MassPointGoal-v0',

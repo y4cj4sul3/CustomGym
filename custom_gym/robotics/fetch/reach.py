@@ -4,17 +4,19 @@ from custom_gym.robotics import fetch_env
 
 
 class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
-    def __init__(self, reward_type='sparse', instr_space=0, act_space=0):
-        print('hello reach')
+    def __init__(self, reward_type='sparse', instr_space=0, act_space=0, goal_range='discrete',
+        obs_content={
+            'achieved_goal': False,
+            'desired_goal': False,
+            'instruction': True,
+        }
+    ):
+        self.goal_range = goal_range
+
         initial_qpos = {
             'robot0:slide0': 0.4049,
             'robot0:slide1': 0.48,
             'robot0:slide2': 0.0,
-        }
-        obs_content = {
-            'achieved_goal': False,
-            'desired_goal': False,
-            'instruction': True,
         }
         fetch_env.FetchEnv.__init__(
             self, 'fetch/reach.xml', has_object=False, block_gripper=True, n_substeps=20,
@@ -32,10 +34,14 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
         # instruction
         self._set_instruction(target)
 
-        # desired goal
-        desired_goal = np.array([self.target_range if (target >> n) & 1 == 1 else -self.target_range for n in range(3)])
-        
-        # goal
-        goal = super()._sample_goal(desired_goal)
+        if self.goal_range == 'discrete':
+            # desired goal
+            desired_goal = np.array([self.target_range if (target >> n) & 1 == 1 else -self.target_range for n in range(3)])
+            # goal
+            goal = super()._sample_goal(desired_goal)
+        else:
+            # random goal in continuous space
+            goal = super()._sample_goal()
+
         return goal
 

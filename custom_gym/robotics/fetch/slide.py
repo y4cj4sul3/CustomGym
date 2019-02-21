@@ -5,17 +5,20 @@ from custom_gym.robotics import fetch_env
 
 
 class FetchSlideEnv(fetch_env.FetchEnv, utils.EzPickle):
-    def __init__(self, reward_type='sparse', instr_space=0, act_space=0):
+    def __init__(self, reward_type='sparse', instr_space=0, act_space=0, goal_range='discrete',
+        obs_content={
+            'achieved_goal': False,
+            'desired_goal': False,
+            'instruction': True,
+        }
+    ):
+        self.goal_range = goal_range
+        
         initial_qpos = {
             'robot0:slide0': 0.05,
             'robot0:slide1': 0.48,
             'robot0:slide2': 0.0,
             'object0:joint': [1.7, 1.1, 0.4, 1., 0., 0., 0.],
-        }
-        obs_content = {
-            'achieved_goal': False,
-            'desired_goal': False,
-            'instruction': True,
         }
         fetch_env.FetchEnv.__init__(
             self, 'fetch/slide.xml', has_object=True, block_gripper=True, n_substeps=20,
@@ -33,19 +36,23 @@ class FetchSlideEnv(fetch_env.FetchEnv, utils.EzPickle):
         # instruction
         self._set_instruction(target)
 
-        # desired goal
-        goals = self.target_range * np.array([
-            [-0.8, -0.8, 0],
-            [-0.8, 0.8, 0],
-            [-0.4, 0, 0],
-            [0, -0.8, 0],
-            [0, 0.8, 0],
-            [0.4, 0, 0],
-            [0.8, -0.8, 0],
-            [0.8, 0.8, 0],
-        ])
-        desired_goal = goals[target]
-
-        # goal
-        goal = super()._sample_goal(desired_goal)
+        if self.goal_range == 'discrete':
+            # desired goal
+            goals = self.target_range * np.array([
+                [-0.8, -0.8, 0],
+                [-0.8, 0.8, 0],
+                [-0.4, 0, 0],
+                [0, -0.8, 0],
+                [0, 0.8, 0],
+                [0.4, 0, 0],
+                [0.8, -0.8, 0],
+                [0.8, 0.8, 0],
+            ])
+            desired_goal = goals[target]
+            # goal
+            goal = super()._sample_goal(desired_goal)
+        else:
+            # random goal in continuous space
+            goal = super()._sample_goal()
+        
         return goal
