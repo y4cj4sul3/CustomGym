@@ -31,9 +31,9 @@ from custom_gym import RecorderWrapper
 #env = gym.make('FetchReach-v4')
 #env = gym.make('FetchPush-v4')
 #env = gym.make('FetchSlide-v4')
-env = gym.make('FetchPickAndPlace-v4')
+#env = gym.make('FetchPickAndPlace-v4')
 
-#env = gym.make('FetchReach-v5')
+env = gym.make('FetchReach-v5')
 #env = gym.make('FetchPush-v5')
 #env = gym.make('FetchSlide-v5')
 #env = gym.make('FetchPickAndPlace-v5')

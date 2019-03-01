@@ -21,13 +21,15 @@ class FetchPushEnv(fetch_env.FetchEnv, utils.EzPickle):
         
         if goal_range == 'discrete':
             target_range = 0.1
+            distance_threshold = 0.05
         else:
             target_range = 0.15
+            distance_threshold = 0.03
             
         fetch_env.FetchEnv.__init__(
             self, 'fetch/push.xml', has_object=True, block_gripper=True, n_substeps=20,
             gripper_extra_height=0.0, target_in_the_air=False, target_offset=0.0,
-            obj_range=0.15, target_range=target_range, distance_threshold=0.05,
+            obj_range=0.15, target_range=target_range, distance_threshold=distance_threshold,
             initial_qpos=initial_qpos, reward_type=reward_type, obs_content=obs_content,
             instr_space=instr_space, act_space=act_space, goal_range=goal_range)
         utils.EzPickle.__init__(self)
