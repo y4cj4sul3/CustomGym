@@ -20,7 +20,7 @@ class FetchEnv(robot_env.RobotEnv):
             "achieved_goal": True,
             "desired_goal": True,
             "instruction": False,
-        }, fix_obj_init_pos=False, instr_space=0, act_space=0
+        }, fix_obj_init_pos=False, instr_space=0, act_space=0, goal_range='discrete'
     ):
         print('hello fetch_env')
         """Initializes a new Fetch environment.
@@ -53,6 +53,7 @@ class FetchEnv(robot_env.RobotEnv):
         self.fix_obj_init_pos = fix_obj_init_pos
         self.instr_space = instr_space
         self.act_space = act_space
+        self.goal_range = goal_range
 
         self.instruction = None
 
@@ -199,21 +200,31 @@ class FetchEnv(robot_env.RobotEnv):
 
     def _sample_goal(self, desired_goal=None):
         
-        # note: desired goal is relative coordinate
-        if desired_goal is None:
-            # if desired goal is not specified
-            # generate a random goal with in the target range
-            desired_goal = self.np_random.uniform(-self.target_range, self.target_range, size=3)
-
-        if self.has_object:
-            goal = self.initial_gripper_xpos[:3] + desired_goal
-            goal += self.target_offset
-            if not self.target_in_the_air:
-                goal[2] = self.height_offset
-            # if self.target_in_the_air and self.np_random.uniform() < 0.5:
-            #     goal[2] += self.np_random.uniform(0, 0.45)
+        if self.goal_range == 'discrete':
+            # note: desired goal is relative coordinate
+            if desired_goal is None:
+                # if desired goal is not specified
+                # generate a random goal with in the target range
+                desired_goal = self.np_random.uniform(-self.target_range, self.target_range, size=3)
+    
+            if self.has_object:
+                goal = self.initial_gripper_xpos[:3] + desired_goal
+                goal += self.target_offset
+                if not self.target_in_the_air:
+                    goal[2] = self.height_offset
+                # if self.target_in_the_air and self.np_random.uniform() < 0.5:
+                #     goal[2] += self.np_random.uniform(0, 0.45)
+            else:
+                goal = self.initial_gripper_xpos[:3] + desired_goal
         else:
-            goal = self.initial_gripper_xpos[:3] + desired_goal
+            if self.has_object:
+                goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(-self.target_range, self.target_range, size=3)
+                goal += self.target_offset
+                goal[2] = self.height_offset
+                if self.target_in_the_air and self.np_random.uniform() < 0.5:
+                    goal[2] += self.np_random.uniform(0, 0.45)
+            else:
+                goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(-0.15, 0.15, size=3)
         return goal.copy()
 
     def _is_success(self, achieved_goal, desired_goal):

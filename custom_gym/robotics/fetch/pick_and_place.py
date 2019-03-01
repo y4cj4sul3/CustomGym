@@ -11,7 +11,6 @@ class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):
             'instruction': True,
         }
     ):
-        self.goal_range = goal_range
         
         initial_qpos = {
             'robot0:slide0': 0.405,
@@ -19,12 +18,18 @@ class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):
             'robot0:slide2': 0.0,
             'object0:joint': [1.25, 0.53, 0.4, 1., 0., 0., 0.],
         }
+        
+        if goal_range == 'discrete':
+            target_range = 0.1
+        else:
+            target_range = 0.15
+        
         fetch_env.FetchEnv.__init__(
             self, 'fetch/pick_and_place.xml', has_object=True, block_gripper=False, n_substeps=20,
             gripper_extra_height=0.2, target_in_the_air=True, target_offset=0.0,
-            obj_range=0.15, target_range=0.1, distance_threshold=0.05,
+            obj_range=0.15, target_range=target_range, distance_threshold=0.05,
             initial_qpos=initial_qpos, reward_type=reward_type, obs_content=obs_content,
-            instr_space=instr_space, act_space=act_space)
+            instr_space=instr_space, act_space=act_space, goal_range=goal_range)
         utils.EzPickle.__init__(self)
 
     def _sample_goal(self, target=None):
